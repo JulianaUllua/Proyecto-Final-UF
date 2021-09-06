@@ -31,6 +31,10 @@
                         AppMenuTextItem:
                                 text: 'Run Pipe'
                                 on_release: root.find_pipes()  
+                                ContextMenu: 
+                        AppMenuTextItem:
+                                text: 'Guardar Todo'
+                                #on_release: 
                                 ContextMenu:    
                 AppMenu:
                         id: tool_bar
@@ -68,7 +72,7 @@
                         canvas:
                                 Color:
                                         rgba: 255, 255, 255, 255
-                                                    
+
 
 <MyScatterLayout>:
         
@@ -178,7 +182,57 @@
                         ContextMenuTextItem:
                                 text: "Edit outputs"
                                 on_release: root.add_outputs(root)
-                        
+
+<MenuScreen>:
+        BoxLayout:
+                size_hint: None, None
+                size: 350, 100
+                center: root.center
+                orientation: 'vertical'
+                Label:
+                        text: "ProtoPype"
+                        bold: True
+                        font_size:'20sp'
+                        Image:
+                                source:"icons\\pipe.png"
+                                center_x: self.parent.center_x + 60
+                                center_y: self.parent.center_y
+                                size: 25,25
+                Label:
+                        size_hint: 0.1,0.3 
+                Button:
+                        text: 'New'
+                        on_press: root.manager.current = 'main screen'
+                        background_color: 0,0,0,0
+                        canvas.before:
+                                Color:
+                                        rgba: 1, 1, 1, 1
+                                Line:
+                                        width: 1
+                                        rounded_rectangle: self.x, self.y, self.width, self.height, 8, 20
+                        Image:
+                                source:"icons\\new.png"
+                                center_x: self.parent.center_x - 34
+                                center_y: self.parent.center_y
+                                size: 25,25
+                Label:
+                        size_hint: 0.1,0.3  
+                Button:
+                        text: 'Open'
+                        background_color: 0,0,0,0
+                        canvas.before:
+                                Color:
+                                        rgba: 1, 1, 1, 1
+                                Line:
+                                        width: 1
+                                        rounded_rectangle: self.x, self.y, self.width, self.height, 8, 20
+                        Image:
+                                source:"icons\\open.png"
+                                center_x: self.parent.center_x - 34
+                                center_y: self.parent.center_y
+                                size: 23,23
+
+
 <Parameters_Popup>:
         BoxLayout:
                 orientation:"horizontal"

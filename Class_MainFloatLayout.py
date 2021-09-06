@@ -20,7 +20,7 @@ from kivy.garden.matplotlib import FigureCanvasKivyAgg
 from kivy.app import App
 from kivy.config import Config
 import kivy.properties as kprop
-from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
+
 from kivy.lang import Builder
 from kivy.factory import Factory
 
@@ -38,14 +38,15 @@ from kivy.uix.slider import Slider
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
-from kivy.core.window import Window
+
 from kivy.uix.label import Label
 from kivy.uix.bubble import Bubble
-from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
-from kivy.uix.image import Image
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
 
-from kivy.core.image import Image
+from kivy.core.window import Window
+from kivy.properties import ObjectProperty
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Ellipse, Line, Rectangle 
 import kivy.graphics.instructions as kins
@@ -60,9 +61,16 @@ import Class_MyScatterLayout as CScatter
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
 class MyApp(App):
-
+    
     def build(self):
-        return MainFloatLayout()
+        sm = ScreenManager()
+        mf = MainFloatScreen(name= 'main screen')
+        mf.add_widget(MainFloatLayout())
+        sm.add_widget(mf)
+        sm.add_widget(MenuScreen(name='menu screen'))
+        sm.current = 'menu screen'
+
+        return sm
         
     
 class Pipeline:
@@ -553,6 +561,11 @@ class MainFloatLayout(FloatLayout):
                                     elif group != list(self.list_toposort[-1]):
                                         pipeline.output_toinput(self.scatter_list[int(node)])
 
+class MainFloatScreen(Screen):
+    pass
+
+class MenuScreen(Screen):
+    pass
 
 class MyHistogram(FigureCanvasKivyAgg):
     def __init__(self, image, **kwargs):
