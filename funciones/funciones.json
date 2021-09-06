@@ -1,0 +1,312 @@
+[
+    {
+      "nombre": "Load Image",
+      "funcion": "cv2.imread",
+      "group": "Input/Output",
+      "input images": 0,
+      "output images": 1,
+      "parameters_order": [],
+      "outputs_order": ["dst"],
+      "widgets": [{"especial":"self.load_dialog()"}]
+    },
+    {
+        "nombre": "Resize",
+        "funcion": "cv2.resize",
+        "group": "Geometry",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["dsize","fx", "fy","Interpolation"],
+        "outputs_order": ["dst"],
+        "widgets": 
+        [{
+            "spinner": [
+                {
+                    "text":"cv2.INTER_CUBIC",
+                    "values":["cv2.INTER_NEAREST","cv2.INTER_LINEAR","cv2.INTER_AREA","cv2.INTER_CUBIC", "cv2.INTER_LANCZOS4"],
+                    "label":"Interpolation"}
+                    ],
+                "text input": [
+                {
+                    "input type": "float",
+                    "text": 0.5,
+                    "label": "fx"
+                },
+                {
+                    "input type": "float",
+                    "text": 0.5,
+                    "label": "fy"
+                }] 
+        }]
+    },
+    {
+        "nombre": "Change Colorspace",
+        "funcion": "cv2.cvtColor",
+        "group": "Conversions",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["Color"],
+        "outputs_order": ["dst"],
+        "widgets": [{
+                    "spinner": [
+                        {"text":"cv2.COLOR_BGR2GRAY",
+                        "values":["cv2.COLOR_BGR2HSV","cv2.COLOR_BGR2GRAY","cv2.COLOR_BGR2BGRA","cv2.COLOR_RGB2RGBA"],
+                        "label":"Color"}
+                               ]
+                    }]
+    },
+    {
+        "nombre": "Apply ColorMap",
+        "funcion": "cv2.applyColorMap",
+        "group": "Conversions",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["ColorMap"],
+        "outputs_order": ["dst"],
+        "widgets": [{
+                    "image spinner": [
+                        {"text":"cv2.COLORMAP_AUTUMN",
+                        "options": {"cv2.COLORMAP_AUTUMN": "icons/colorscale_autumn.jpg", "cv2.COLORMAP_BONE": "icons/colorscale_bone.jpg", 
+                            "cv2.COLORMAP_JET": "icons/colorscale_jet.jpg", "cv2.COLORMAP_WINTER": "icons/colorscale_winter.jpg",
+                            "cv2.COLORMAP_RAINBOW": "icons/colorscale_rainbow.jpg","cv2.COLORMAP_OCEAN": "icons/colorscale_ocean.jpg",
+                            "cv2.COLORMAP_SUMMER": "icons/colorscale_summer.jpg","cv2.COLORMAP_SPRING": "icons/colorscale_spring.jpg",
+                            "cv2.COLORMAP_COOL": "icons/colorscale_cool.jpg","cv2.COLORMAP_HSV": "icons/colorscale_HSV.jpg",
+                            "cv2.COLORMAP_PINK": "icons/colorscale_pink.jpg","cv2.COLORMAP_HOT": "icons/colorscale_hot.jpg",
+                            "cv2.COLORMAP_PARULA": "icons/colorscale_parula.jpg","cv2.COLORMAP_MAGMA": "icons/colorscale_magma.jpg",
+                            "cv2.COLORMAP_INFERNO": "icons/colorscale_inferno.jpg","cv2.COLORMAP_PLASMA": "icons/colorscale_plasma.jpg",
+                            "cv2.COLORMAP_VIRIDIS": "icons/colorscale_viridis.jpg","cv2.COLORMAP_CIVIDIS": "icons/colorscale_cividis.jpg",
+                            "cv2.COLORMAP_TWILIGHT": "icons/colorscale_twilight.jpg","cv2.COLORMAP_TWILIGHT_SHIFTED": "icons/colorscale_twilight_shifted.jpg",
+                            "cv2.COLORMAP_TURBO": "icons/colorscale_turbo.jpg","cv2.COLORMAP_DEEPGREEN": "icons/colorscale_deepgreen.jpg"},
+                        "label":"ColorMap"}
+                               ]
+                    }]
+    },
+    {
+        "nombre": "Median Blur",
+        "funcion": "cv2.medianBlur",
+        "group": "Local Operations",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["ksize"],
+        "outputs_order": ["dst"],
+        "widgets": [{
+                "slider": [
+                    {"min":1, "max":99, "step": 2, "value": 13, "label":"ksize"}
+                ]
+            }]
+    },
+    {
+        "nombre": "Gaussian Blur",
+        "funcion": "cv2.GaussianBlur",
+        "group": "Local Operations",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["ksize","SigmaX", "SigmaY", "borderType"],
+        "outputs_order": ["dst"],
+        "widgets": [{
+            "spinner": [
+                {
+                    "text":"cv2.BORDER_DEFAULT",
+                    "values":["cv2.BORDER_CONSTANT","cv2.BORDER_REPLICATE","cv2.BORDER_REFLECT","cv2.BORDER_REFLECT_101","cv2.BORDER_TRANSPARENT","cv2.BORDER_DEFAULT","cv2.BORDER_ISOLATED"],
+                    "label":"borderType"
+                }
+                    ],
+            "size": [
+                {
+                    "label": "ksize",
+                    "input type 1": "int",
+                    "input type 2": "int",
+                    "value 1": 3,
+                    "value 2": 3,
+                    "specification": "odd"
+
+                }   ],
+                "text input": [
+                {
+                    "input type": "float",
+                    "text": 0,
+                    "label": "SigmaX"
+                }, 
+                {
+                    "input type": "float",
+                    "text": 0,
+                    "label": "SigmaY"
+                }]
+                  
+            }]
+    },
+    
+    {
+        "nombre": "Threshold",
+        "funcion": "cv2.threshold",
+        "group": "Point Operations",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["Threshold", "MaxVal", "Type"],
+        "outputs_order": ["retval", "dst"],
+        "widgets": [{
+            "spinner": [
+                {
+                    "text":"cv2.THRESH_BINARY",
+                    "values":["cv2.THRESH_BINARY","cv2.THRESH_BINARY_INV","cv2.THRESH_TRUNC","cv2.THRESH_TOZERO", "cv2.THRESH_TOZERO_INV"],
+                    "label":"Type"
+                }
+                    ],
+            "slider": [
+                        {"min":1, "max":255, "step": 1, "value": 255, "label":"MaxVal"},
+                        {"min":1, "max":255, "step": 1, "value": 145, "label":"Threshold"}
+                    ]            
+            }]
+    },
+    {
+        "nombre": "Otsu",
+        "funcion": "cv2.threshold",
+        "group": "Point Operations",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["Threshold", "MaxVal", "Type"],
+        "outputs_order": ["retval", "dst"],
+        "widgets": [{
+            "assign": [
+                        {"text":"cv2.THRESH_OTSU", "label": "Type"} 
+                    ],
+            "slider": [
+                        {"min":1, "max":255, "step": 1, "value": 255, "label":"MaxVal"},
+                        {"min":1, "max":255, "step": 1, "value": 40, "label":"Threshold"}
+                    ]            
+            }]
+    },
+    {
+        "nombre": "Adaptive Threshold",
+        "funcion": "cv2.adaptiveThreshold",
+        "group": "Point Operations",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["MaxVal", "adaptiveMethod", "Type", "blockSize","C"],
+        "outputs_order": ["dst"],
+        "widgets": [{
+            "slider": [
+                {"min":1, "max":255, "step": 1, "value": 125, "label":"MaxVal"},
+                {"min":3, "max":99, "step": 2, "value": 3, "label":"blockSize"},
+                {"min":-50, "max":50, "step": 1, "value": 0, "label":"C"}
+            ],
+            "spinner": [
+                {
+                    "text":"cv2.ADAPTIVE_THRESH_MEAN_C",
+                    "values":["cv2.ADAPTIVE_THRESH_MEAN_C","cv2.ADAPTIVE_THRESH_GAUSSIAN_C"],
+                    "label":"adaptiveMethod"
+                },
+                {
+                    "text":"cv2.THRESH_BINARY",
+                    "values":["cv2.THRESH_BINARY","cv2.THRESH_BINARY_INV"],
+                    "label":"Type"
+                }
+                    ]
+                
+            }]
+    },
+    {
+        "nombre": "Canny",
+        "funcion": "cv2.Canny",
+        "group": "Local Operations",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["Min threshold","Max threshold", "apertureSize"],
+        "outputs_order": ["edges"],
+        "widgets": [{
+            "slider": [
+                {"min":1, "max":255, "step": 1, "value": 100, "label":"Min threshold"},
+                {"min":1, "max":255, "step": 1, "value": 200, "label":"Max threshold"},
+                {"min":3, "max":7, "step": 2, "value": 3, "label":"apertureSize"}
+            ]
+
+      }]
+    },
+    {
+        "nombre": "Laplacian",
+        "funcion": "cv2.Laplacian",
+        "group": "Local Operations",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["ddepth","ksize", "scale", "delta","Type"],
+        "outputs_order": ["dst"],
+        "widgets": [{
+            "spinner": [
+                {
+                    "text":"cv2.CV_64F",
+                    "values":["cv2.CV_8U","cv2.CV_16S","cv2.CV_32F","cv2.CV_64F","cv2.CV_16U"],
+                    "label":"ddepth"
+                },
+                {
+                    "text":"cv2.BORDER_DEFAULT",
+                    "values":["cv2.BORDER_CONSTANT","cv2.BORDER_REPLICATE","cv2.BORDER_REFLECT","cv2.BORDER_REFLECT_101","cv2.BORDER_TRANSPARENT","cv2.BORDER_DEFAULT","cv2.BORDER_ISOLATED"],
+                    "label":"Type"
+                }
+                    ],
+            "slider": [
+                        {"min":1, "max":100, "step": 2, "value": 3, "label":"ksize"},
+                        {"min":0, "max":100, "step": 1, "value": 1, "label":"scale"},
+                        {"min":0, "max":100, "step": 1, "value": 0, "label":"delta"}
+                    ]
+      }]
+    },
+    {
+        "nombre": "Convert Scale Abs",
+        "funcion": "cv2.convertScaleAbs",
+        "group": "Conversions",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": [],
+        "outputs_order": ["dst"],
+        "widgets": []
+    },
+    {
+        "nombre": "Bitwise And",
+        "funcion": "cv2.bitwise_and",
+        "group": "Arithmetic Operations",
+        "input images": 2,
+        "output images": 1,
+        "parameters_order": ["dst","mask"],
+        "outputs_order": ["dst"],
+        "widgets": []
+    },
+    {
+        "nombre": "Ones Like",
+        "funcion": "np.ones_like",
+        "group": "Numpy Functions",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["array"],
+        "outputs_order": ["ndarray"],
+        "widgets": []
+    },
+    {
+        "nombre": "Zeros Like",
+        "funcion": "np.zeros_like",
+        "group": "Numpy Functions",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["array"],
+        "outputs_order": ["ndarray"],
+        "widgets": []
+    },
+    {
+        "nombre": "Full Like",
+        "funcion": "np.full_like",
+        "group": "Numpy Functions",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["array"],
+        "outputs_order": ["ndarray"],
+        "widgets": []
+    },
+    {
+        "nombre": "Empty Like",
+        "funcion": "np.empty_like",
+        "group": "Numpy Functions",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["array"],
+        "outputs_order": ["ndarray"],
+        "widgets": []
+    }             
+]
