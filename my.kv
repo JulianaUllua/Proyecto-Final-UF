@@ -1,5 +1,6 @@
 #:kivy 1.1.0
 #: import Button kivy.uix.button.Button
+#:import F kivy.factory.Factory
 
 <MainFloatLayout>:
         id: mainfloat
@@ -37,11 +38,11 @@
                         top: root.height - top_menu.size[1]
                         cancel_handler_widget: mainfloat
 
-                        AppMenuTextItem:
+                        FilterDDTrigger:
+                                size_hint: 0.2, 1
                                 text: 'Tool Bar'
-                                ContextMenu:
-                                        id: funciones_box
-                                        visible: False
+                                dropdown:
+                                        F.FilterDD()
                           
                 FloatLayout:
                         id: bloques_box
@@ -551,3 +552,21 @@
                 size: 25,25
                 #allow_stretch: True
         
+<MyLabel>:
+        background_color: 0.2, 0.2, 0.2, 1.0
+        canvas.before:
+                Color:
+                        rgba: self.background_color
+                Rectangle:
+                        size: self.size
+                        pos: self.pos
+        #text properties
+        color: 0.7, 0.7, 0.7, 1.0
+        #outline_color: 0,0,0
+        #outline_width: 1
+
+<DDButton@Button>:
+        size_hint_y: None
+        height: '50dp'
+        # Double .parent because dropdown proxies add_widget to container
+        on_release: self.parent.parent.select(self.text)
