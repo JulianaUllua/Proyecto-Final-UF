@@ -42,25 +42,6 @@
                                 ContextMenu:
                                         id: funciones_box
                                         visible: False
-
-                        TextInput:
-                        #self.ids.tool_bar.add_item(TextInput(hint_text= "enter function name", multiline= False, background_color= (0.2, 0.2, 0.2, 1.0), foreground_color= (1,1,1,1), cursor_color=(1,1,1,1)))
-                                id: search_function
-                                hint_text: "enter function name"
-                                multiline: False
-                                background_color: (0.2, 0.2, 0.2, 1.0)
-                                foreground_color: (1,1,1,1)
-                                cursor_color:(1,1,1,1)
-                                on_text_validate: root.search_function(self.text)
-                                size_hint: None, 1 #no modificar porque se mueve de lugar
-
-                        AppMenuTextItem:
-                                text: '>'
-                                id: search_funciones_release
-                                ContextMenu:
-                                        visible: False
-                                        id: search_funciones_box
-
                           
                 FloatLayout:
                         id: bloques_box

@@ -24,10 +24,6 @@ from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
 from kivy.lang import Builder
 from kivy.factory import Factory
 
-
-#Hola
-
-
 import kivy_garden.contextmenu
 from kivy_garden.contextmenu import AbstractMenuItem
 
@@ -145,16 +141,6 @@ class MainFloatLayout(FloatLayout):
 
     def __init__(self, **kwargs):
         super(MainFloatLayout, self).__init__(**kwargs)
-        groups = CFunction.orderby_groups()
-        
-        for key, value in groups.items():
-            #if key == "Numpy Functions":
-            #    break
-            #ver
-            group = ContextMenuDivider(text=key)
-            self.ids.funciones_box.add_item(group)
-            for element in value:
-                self.ids.funciones_box.add_text_item(element.nombre, on_release=self.new_bloque)
         
     def new_bloque(self, obj):
         nombre = obj.text
@@ -176,66 +162,6 @@ class MainFloatLayout(FloatLayout):
             filename = r'C:\Users\Juliana\Pictures\cell.png'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
-
-    #borrar?
-    def search_function2(self, function_name):
-        if function_name != '':
-            function_names = []
-            for element in CFunction.funciones:
-                function_names.append(element.nombre.lower())
-            matching = [f for f in function_names if function_name.lower() in f] #se buscan en lower para que no distinga mayusculas
-            
-            self.ids.funciones_box.clear_widgets()
-            for element in matching:
-                i = function_names.index(element)
-                self.ids.funciones_box.add_item(ContextMenuDivider(text=CFunction.funciones[i].group))
-                self.ids.funciones_box.add_text_item(CFunction.funciones[i].nombre, on_release=self.new_bloque)
-            self.ids.funciones_box.show(self.ids.tool_bar.pos[0], self.ids.tool_bar.pos[1])
-        else:
-            self.ids.funciones_box.clear_widgets()
-            groups = CFunction.orderby_groups()
-            for key, value in groups.items():
-                group = ContextMenuDivider(text=key)
-                self.ids.funciones_box.add_item(group)
-                for element in value:
-                    self.ids.funciones_box.add_text_item(element.nombre, on_release=self.new_bloque)
-
-    def search_function(self, function_name):
-        if function_name != '':
-            function_names = []
-            for element in CFunction.funciones:
-                function_names.append(element.nombre.lower())
-            matching = [f for f in function_names if function_name.lower() in f] #se buscan en lower para que no distinga mayusculas
-            
-            self.ids.search_funciones_box.clear_widgets()
-            for element in matching:
-                i = function_names.index(element)
-                self.ids.search_funciones_box.add_item(ContextMenuDivider(text=CFunction.funciones[i].group))
-                self.ids.search_funciones_box.add_text_item(CFunction.funciones[i].nombre, on_release=self.new_bloque)
-            #self.ids.search_funciones_box.show(self.ids.search_function.pos[0], self.ids.search_function.pos[1])
-            #self.ids.search_funciones_release.state == 'down'
-            #self.ids.search_funciones_release.on_release()
-            #ver solucion
-        else:
-            self.ids.search_funciones_box.clear_widgets()
-            self.ids.search_funciones_box.visible = False
-
-    def search_function3(self, function_name):
-        if function_name != '':
-            function_names = []
-            for element in CFunction.funciones:
-                function_names.append(element.nombre.lower())
-            matching = [f for f in function_names if function_name.lower() in f] #se buscan en lower para que no distinga mayusculas
-            
-            dropdown = DropDown()
-            for element in matching:
-                i = function_names.index(element)
-                btn = Button(text=CFunction.funciones[i].nombre, size_hint_y=None, height=44)
-                btn.bind(on_release=self.new_bloque)
-                dropdown.add_widget(btn)
-            
-            self.ids.bloques_box.add_widget(dropdown)
-            dropdown.open(self)
 
     def draw_line_pipe(self, myscatter, button_id, instance):
         pos = instance.pos # posicion del boton

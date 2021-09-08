@@ -110,8 +110,6 @@ class Bloque:
                         
                 return list(self.outputs.values())
 
-
-       
         except NameError: 
             print("NameError: Hay un o mas bloque/s sin input/s. Verifique las uniones")
 
