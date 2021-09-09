@@ -629,7 +629,8 @@ class FilterDDTrigger(Factory.BoxLayout):
         background_color= (0.2, 0.2, 0.2, 1.0), foreground_color= (1,1,1,1), cursor_color= (1,1,1,1))
         ti.bind(text=self._apply_filter)
         ti.bind(on_text_validate=self._on_enter)
-        self._button = btn = Factory.Button(text=self.text, background_normal = '', background_color= (0.2, 0.2, 0.2, 1.0))
+        self._button = btn = Factory.Button(text=self.text, background_normal = '', background_down = '', background_disabled_normal= "", background_disabled_down= "")
+        btn.background_color= (0.2, 0.71, 0.9, 1) if btn.state == 'down' else (0.2, 0.2, 0.2, 1.0)
         btn.bind(on_release=self._on_release)
         self.add_widget(btn)
 
