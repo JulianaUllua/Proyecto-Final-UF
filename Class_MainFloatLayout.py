@@ -12,7 +12,7 @@ from cv2 import cv2
 from numpy.lib.type_check import imag
 from toposort import toposort
 from concurrent import futures
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, process, as_completed
+from concurrent.futures import ThreadPoolExecutor
 
 matplotlib.use("module://kivy.garden.matplotlib.backend_kivy")
 import kivy.garden 
@@ -48,7 +48,7 @@ from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty
 from kivy.graphics.texture import Texture
-from kivy.graphics import Color, Ellipse, Line, Rectangle 
+from kivy.graphics import Color, Ellipse, Line, Rectangle, Bezier 
 import kivy.graphics.instructions as kins
 
 #import modulo clase
@@ -164,9 +164,9 @@ class MainFloatLayout(FloatLayout):
         nombre = obj.text
         Fun = CFunction.BuscarFuncion(nombre)
         scatter = CScatter.MyScatterLayout(draw_line_pipe = self.draw_line_pipe, update_line = self.update_line, delete_scatter = self.delete_scatter, 
-                funcion = Fun, size=(150, 150), scatter_id = str(self.scatter_count),  size_hint=(None, None), pos=(self.location,(Window.system_size[1]/2)))
+                funcion = Fun, size=(150, 150), scatter_id = str(self.scatter_count),  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
         if self.location < Window.system_size[0]* 0.8:
-            self.location = self.location + 150
+            self.location = self.location + 165
         else:
             self.location= Window.system_size[0]*0.10
         self.ids.bloques_box.add_widget(scatter)
@@ -176,8 +176,8 @@ class MainFloatLayout(FloatLayout):
         if nombre == "Load Image":
             self.start_blocks.append(scatter.scatter_id) # para comenzar los paths desde estos
             
-            #filename = r'C:\Users\trini\Pictures\lena.png'
-            filename = r'C:\Users\Juliana\Pictures\cell.png'
+            filename = r'C:\Users\trini\Pictures\lena.png'
+            #filename = r'C:\Users\Juliana\Pictures\cell.png'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
 
@@ -348,7 +348,10 @@ class MainFloatLayout(FloatLayout):
         
         # se guardan los primeros y los ultimos en la lista para encontrar los paths
         start_blocks = [block for block in self.start_blocks if block in self.scats]
-        finish_blocks = self.list_toposort[-1]
+        try:
+            finish_blocks = self.list_toposort[-1]
+        except IndexError: #en caso de que haya un solo bloque, no funciona usar [-1], y da index error. No hay que crear ningun path, asique simplemente es un pass
+            pass
 
         # se buscan los path
         for start in start_blocks:
@@ -367,6 +370,18 @@ class MainFloatLayout(FloatLayout):
 
         #except IndexError:
         #    print("IndexError: Debe unir por lo menos dos bloques")
+    def from_file(self,filename):
+        
+        pass
+
+    def to_file(self,filename):
+        try:
+            with open("pepe.json") as f:
+                json.dump(self, f, indent=4, ensure_ascii=False)
+        except Exception as ex:
+            print(ex)
+
+
 
     def run_pipes(self): 
         for group in self.list_toposort:
@@ -532,6 +547,8 @@ class MainFloatLayout(FloatLayout):
                 if scatter_id in group:
                     index = self.list_toposort.index(group)
                     break
+                else:
+                    index = 0
 
             for group in self.list_toposort[index:]:
                 group = list(group) # se guarda al set como list
@@ -547,7 +564,6 @@ class MainFloatLayout(FloatLayout):
                                 for element in values:
                                     if isinstance(element, np.ndarray):
                                         CScatter.MyScatterLayout.view_scatter_image(scats[i], element)
-                                        print(type(element))
                             i=i+1
 
                 # asignacion de outputs a inputs
@@ -560,6 +576,9 @@ class MainFloatLayout(FloatLayout):
                                         pipeline.output_toinput(self.scatter_list[int(node)], line)
                                     elif group != list(self.list_toposort[-1]):
                                         pipeline.output_toinput(self.scatter_list[int(node)])
+
+    #def save_pipeline(self):
+
 
 class MainFloatScreen(Screen):
     pass
@@ -632,11 +651,6 @@ class MyLine:
     def clear_lines(self):
         self.line.clear()          
 
-    def on_touch_down(self,touch):
-        if touch.button == 'right':
-            if not hasattr(self, 'bubble'):
-                self.bubble = CScatter.MyBubble(pos=self.to_local(self.center_x - self.width*0.5,self.center_y))
-                self.ids.funcion_scatter.add_widget(self.bubble)
 
 if __name__ == '__main__':
     MyApp().run()

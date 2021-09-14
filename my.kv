@@ -34,7 +34,7 @@
                                 ContextMenu: 
                         AppMenuTextItem:
                                 text: 'Guardar Todo'
-                                #on_release: 
+                                #on_release: root.save_pipeline()
                                 ContextMenu:    
                 AppMenu:
                         id: tool_bar
@@ -184,13 +184,20 @@
                                 on_release: root.add_outputs(root)
 
 <MenuScreen>:
+        canvas.before:
+                Rectangle:
+                        pos: self.pos
+                        size: self.size
+                        source:"icons\\background.jpg"
         BoxLayout:
+                
                 size_hint: None, None
                 size: 350, 100
                 center: root.center
                 orientation: 'vertical'
                 Label:
                         text: "ProtoPype"
+                        font_name: "Roboto"
                         bold: True
                         font_size:'20sp'
                         Image:
@@ -202,14 +209,16 @@
                         size_hint: 0.1,0.3 
                 Button:
                         text: 'New'
+                        font_name: "Roboto"
                         on_press: root.manager.current = 'main screen'
+                        
                         background_color: 0,0,0,0
                         canvas.before:
                                 Color:
                                         rgba: 1, 1, 1, 1
                                 Line:
                                         width: 1
-                                        rounded_rectangle: self.x, self.y, self.width, self.height, 8, 20
+                                        rounded_rectangle: self.x, self.y, self.width, self.height, 8, 100
                         Image:
                                 source:"icons\\new.png"
                                 center_x: self.parent.center_x - 34
@@ -219,13 +228,14 @@
                         size_hint: 0.1,0.3  
                 Button:
                         text: 'Open'
+                        font_name: "Roboto"
                         background_color: 0,0,0,0
                         canvas.before:
                                 Color:
                                         rgba: 1, 1, 1, 1
                                 Line:
                                         width: 1
-                                        rounded_rectangle: self.x, self.y, self.width, self.height, 8, 20
+                                        rounded_rectangle: self.x, self.y, self.width, self.height, 8, 100
                         Image:
                                 source:"icons\\open.png"
                                 center_x: self.parent.center_x - 34
@@ -515,8 +525,8 @@
                                 size_hint_y: None
                                 height: 30
                                 multiline: False
-                                #text: "C:/Users/trini/Pictures"
-                                text:"C:/Users/Juliana/Downloads"
+                                text: "C:/Users/trini/Pictures"
+                                #text:"C:/Users/Juliana/Downloads"
                                 #El text esta puesto por comodidad para nosotras. 
                                 #En un futuro deberiamos eliminarlo o dejar como ejemplo en hint_text
                                 on_text_validate: load.new_path(path_input.text)
