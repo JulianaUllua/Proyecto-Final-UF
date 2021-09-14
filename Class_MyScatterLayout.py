@@ -820,7 +820,6 @@ class MyCheckBox(ContextMenuItem, GridLayout):
     def on_checkbox_active(self,value):
         self.active = value
             
-
 class MyParameterButton(Button):
     def __init__(self, button_id, parameter_text, source, **kwargs):
         super(MyParameterButton, self).__init__(**kwargs)
@@ -830,7 +829,7 @@ class MyParameterButton(Button):
         self.ids.param_imag.source = source
         Window.bind(mouse_pos=self.on_mouse_pos)# binding[subscribe]Event handling method of mouse position change
 
-# Mouse position processing method
+    # Mouse position processing method
     def on_mouse_pos(self, window, pos):
          # Get mouse position data
         #pos = args[1]
@@ -850,7 +849,6 @@ class MyParameterButton(Button):
     def mouse_enter_css(self, *args):   
         self.background_color = [0,1,0,1]
     
-
 class MyIconButton(Button):
     pass
 
