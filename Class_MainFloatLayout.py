@@ -298,8 +298,6 @@ class MainFloatLayout(FloatLayout):
         
         self.run_pipes()
 
-        #except IndexError:
-        #    print("IndexError: Debe unir por lo menos dos bloques")
     def from_file(self,filename):
         
         pass
