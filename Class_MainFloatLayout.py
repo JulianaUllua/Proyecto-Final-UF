@@ -106,6 +106,7 @@ class Pipeline:
     def output_toinput(self, node, line = 0):
         # recibe un node para que se asigne su output al input del siguiente elemento en el pipe
         # recibe line != 0 si hay union de tipo output-parametro input
+        # --
         if node in self.pipe: #se puede sacar
             i = self.pipe.index(node)
             for key, value in self.pipe[i].outputs.items():
