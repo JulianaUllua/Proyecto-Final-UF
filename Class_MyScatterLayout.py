@@ -112,8 +112,6 @@ class Bloque:
                         
                 return list(self.outputs.values())
 
-
-       
         except NameError: 
             print("NameError: Hay un o mas bloque/s sin input/s. Verifique las uniones")
 
@@ -822,7 +820,6 @@ class MyCheckBox(ContextMenuItem, GridLayout):
     def on_checkbox_active(self,value):
         self.active = value
             
-
 class MyParameterButton(Button):
     def __init__(self, button_id, parameter_text, source, **kwargs):
         super(MyParameterButton, self).__init__(**kwargs)
@@ -830,29 +827,8 @@ class MyParameterButton(Button):
         self.parameter_text = parameter_text #para guardar el texto con el que se identifica el parametro en el diccionario (parameters o outputs)
         self.source = source
         self.ids.param_imag.source = source
-        Window.bind(mouse_pos=self.on_mouse_pos)# binding[subscribe]Event handling method of mouse position change
-
-# Mouse position processing method
-    def on_mouse_pos(self, window, pos):
-         # Get mouse position data
-        #pos = args[1]
-         # Check whether the mouse position is in the control
-        if self.collide_point(*pos):
-             # If on a control, the style method entered by the mouse is called
-            Clock.schedule_once(self.mouse_enter_css, 0)
-        else:
-             # If on a control, the style method of mouse out is called
-            Clock.schedule_once(self.mouse_leave_css, 0)
- 
-    def mouse_leave_css(self, *args):
-         # Reset background and mouse styles
-        #self.background_color = [0,0,0,0]
-        pass
- 
-    def mouse_enter_css(self, *args):   
-        self.background_color = [0,1,0,1]
+        #Window.bind(mouse_pos=self.on_mouse_pos)# binding[subscribe]Event handling method of mouse position change
     
-
 class MyIconButton(Button):
     pass
 

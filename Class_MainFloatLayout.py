@@ -12,7 +12,7 @@ from cv2 import cv2
 from numpy.lib.type_check import imag
 from toposort import toposort
 from concurrent import futures
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, process, as_completed
+from concurrent.futures import ThreadPoolExecutor
 
 matplotlib.use("module://kivy.garden.matplotlib.backend_kivy")
 import kivy.garden 
@@ -20,7 +20,7 @@ from kivy.garden.matplotlib import FigureCanvasKivyAgg
 from kivy.app import App
 from kivy.config import Config
 import kivy.properties as kprop
-from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
+
 from kivy.lang import Builder
 from kivy.factory import Factory
 
@@ -38,16 +38,17 @@ from kivy.uix.slider import Slider
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
-from kivy.core.window import Window
+
 from kivy.uix.label import Label
 from kivy.uix.bubble import Bubble
-from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
-from kivy.uix.image import Image
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
 
-from kivy.core.image import Image
+from kivy.core.window import Window
+from kivy.properties import ObjectProperty
 from kivy.graphics.texture import Texture
-from kivy.graphics import Color, Ellipse, Line, Rectangle 
+from kivy.graphics import Color, Ellipse, Line, Rectangle, Bezier 
 import kivy.graphics.instructions as kins
 
 #import modulo clase
@@ -60,9 +61,16 @@ import Class_MyScatterLayout as CScatter
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
 class MyApp(App):
-
+    
     def build(self):
-        return MainFloatLayout()
+        sm = ScreenManager()
+        mf = MainFloatScreen(name= 'main screen')
+        mf.add_widget(MainFloatLayout())
+        sm.add_widget(mf)
+        sm.add_widget(MenuScreen(name='menu screen'))
+        sm.current = 'menu screen'
+
+        return sm
         
     
 class Pipeline:
@@ -98,6 +106,7 @@ class Pipeline:
     def output_toinput(self, node, line = 0):
         # recibe un node para que se asigne su output al input del siguiente elemento en el pipe
         # recibe line != 0 si hay union de tipo output-parametro input
+        # --
         if node in self.pipe: #se puede sacar
             i = self.pipe.index(node)
             for key, value in self.pipe[i].outputs.items():
@@ -141,97 +150,26 @@ class MainFloatLayout(FloatLayout):
 
     def __init__(self, **kwargs):
         super(MainFloatLayout, self).__init__(**kwargs)
-        groups = CFunction.orderby_groups()
         
-        for key, value in groups.items():
-            #if key == "Numpy Functions":
-            #    break
-            #ver
-            group = ContextMenuDivider(text=key)
-            self.ids.funciones_box.add_item(group)
-            for element in value:
-                self.ids.funciones_box.add_text_item(element.nombre, on_release=self.new_bloque)
-        
-    def new_bloque(self, obj):
-        nombre = obj.text
-        Fun = CFunction.BuscarFuncion(nombre)
+    def new_bloque(self, value):
+        Fun = CFunction.BuscarFuncion(value)
         scatter = CScatter.MyScatterLayout(draw_line_pipe = self.draw_line_pipe, update_line = self.update_line, delete_scatter = self.delete_scatter, 
-                funcion = Fun, size=(150, 150), scatter_id = str(self.scatter_count),  size_hint=(None, None), pos=(self.location,(Window.system_size[1]/2)))
+                funcion = Fun, size=(150, 150), scatter_id = str(self.scatter_count),  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
         if self.location < Window.system_size[0]* 0.8:
-            self.location = self.location + 150
+            self.location = self.location + 165
         else:
             self.location= Window.system_size[0]*0.10
         self.ids.bloques_box.add_widget(scatter)
         self.scatter_list.append(scatter)
         self.scatter_count +=1
 
-        if nombre == "Load Image":
+        if value == "Load Image":
             self.start_blocks.append(scatter.scatter_id) # para comenzar los paths desde estos
             
-            #filename = r'C:\Users\trini\Pictures\lena.png'
-            filename = r'C:\Users\Juliana\Pictures\cell.png'
+            filename = r'C:\Users\trini\Pictures\lena.png'
+            #filename = r'C:\Users\Juliana\Pictures\cell.png'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
-
-    #borrar?
-    def search_function2(self, function_name):
-        if function_name != '':
-            function_names = []
-            for element in CFunction.funciones:
-                function_names.append(element.nombre.lower())
-            matching = [f for f in function_names if function_name.lower() in f] #se buscan en lower para que no distinga mayusculas
-            
-            self.ids.funciones_box.clear_widgets()
-            for element in matching:
-                i = function_names.index(element)
-                self.ids.funciones_box.add_item(ContextMenuDivider(text=CFunction.funciones[i].group))
-                self.ids.funciones_box.add_text_item(CFunction.funciones[i].nombre, on_release=self.new_bloque)
-            self.ids.funciones_box.show(self.ids.tool_bar.pos[0], self.ids.tool_bar.pos[1])
-        else:
-            self.ids.funciones_box.clear_widgets()
-            groups = CFunction.orderby_groups()
-            for key, value in groups.items():
-                group = ContextMenuDivider(text=key)
-                self.ids.funciones_box.add_item(group)
-                for element in value:
-                    self.ids.funciones_box.add_text_item(element.nombre, on_release=self.new_bloque)
-
-    def search_function(self, function_name):
-        if function_name != '':
-            function_names = []
-            for element in CFunction.funciones:
-                function_names.append(element.nombre.lower())
-            matching = [f for f in function_names if function_name.lower() in f] #se buscan en lower para que no distinga mayusculas
-            
-            self.ids.search_funciones_box.clear_widgets()
-            for element in matching:
-                i = function_names.index(element)
-                self.ids.search_funciones_box.add_item(ContextMenuDivider(text=CFunction.funciones[i].group))
-                self.ids.search_funciones_box.add_text_item(CFunction.funciones[i].nombre, on_release=self.new_bloque)
-            #self.ids.search_funciones_box.show(self.ids.search_function.pos[0], self.ids.search_function.pos[1])
-            #self.ids.search_funciones_release.state == 'down'
-            #self.ids.search_funciones_release.on_release()
-            #ver solucion
-        else:
-            self.ids.search_funciones_box.clear_widgets()
-            self.ids.search_funciones_box.visible = False
-
-    def search_function3(self, function_name):
-        if function_name != '':
-            function_names = []
-            for element in CFunction.funciones:
-                function_names.append(element.nombre.lower())
-            matching = [f for f in function_names if function_name.lower() in f] #se buscan en lower para que no distinga mayusculas
-            
-            dropdown = DropDown()
-            for element in matching:
-                i = function_names.index(element)
-                btn = Button(text=CFunction.funciones[i].nombre, size_hint_y=None, height=44)
-                btn.bind(on_release=self.new_bloque)
-                dropdown.add_widget(btn)
-            
-            self.ids.bloques_box.add_widget(dropdown)
-            dropdown.open(self)
 
     def draw_line_pipe(self, myscatter, button_id, instance):
         pos = instance.pos # posicion del boton
@@ -340,7 +278,10 @@ class MainFloatLayout(FloatLayout):
         
         # se guardan los primeros y los ultimos en la lista para encontrar los paths
         start_blocks = [block for block in self.start_blocks if block in self.scats]
-        finish_blocks = self.list_toposort[-1]
+        try:
+            finish_blocks = self.list_toposort[-1]
+        except IndexError: #en caso de que haya un solo bloque, no funciona usar [-1], y da index error. No hay que crear ningun path, asique simplemente es un pass
+            pass
 
         # se buscan los path
         for start in start_blocks:
@@ -359,6 +300,18 @@ class MainFloatLayout(FloatLayout):
 
         #except IndexError:
         #    print("IndexError: Debe unir por lo menos dos bloques")
+    def from_file(self,filename):
+        
+        pass
+
+    def to_file(self,filename):
+        try:
+            with open("pepe.json") as f:
+                json.dump(self, f, indent=4, ensure_ascii=False)
+        except Exception as ex:
+            print(ex)
+
+
 
     def run_pipes(self): 
         for group in self.list_toposort:
@@ -524,6 +477,8 @@ class MainFloatLayout(FloatLayout):
                 if scatter_id in group:
                     index = self.list_toposort.index(group)
                     break
+                else:
+                    index = 0
 
             for group in self.list_toposort[index:]:
                 group = list(group) # se guarda al set como list
@@ -539,7 +494,6 @@ class MainFloatLayout(FloatLayout):
                                 for element in values:
                                     if isinstance(element, np.ndarray):
                                         CScatter.MyScatterLayout.view_scatter_image(scats[i], element)
-                                        print(type(element))
                             i=i+1
 
                 # asignacion de outputs a inputs
@@ -553,6 +507,14 @@ class MainFloatLayout(FloatLayout):
                                     elif group != list(self.list_toposort[-1]):
                                         pipeline.output_toinput(self.scatter_list[int(node)])
 
+    #def save_pipeline(self):
+
+
+class MainFloatScreen(Screen):
+    pass
+
+class MenuScreen(Screen):
+    pass
 
 class MyHistogram(FigureCanvasKivyAgg):
     def __init__(self, image, **kwargs):
@@ -619,11 +581,135 @@ class MyLine:
     def clear_lines(self):
         self.line.clear()          
 
-    def on_touch_down(self,touch):
-        if touch.button == 'right':
-            if not hasattr(self, 'bubble'):
-                self.bubble = CScatter.MyBubble(pos=self.to_local(self.center_x - self.width*0.5,self.center_y))
-                self.ids.funcion_scatter.add_widget(self.bubble)
+
+class FilterDD(Factory.DropDown):
+    ignore_case = Factory.BooleanProperty(True)
+    options = Factory.ListProperty()
+    options_groups = Factory.ListProperty()
+
+    def __init__(self, **kwargs):
+        self._needle = None
+        self._order = []
+        self._widgets = {}
+        super(FilterDD, self).__init__(**kwargs)
+        groups = CFunction.orderby_groups()
+                
+        for key, value in groups.items():
+            self.options_groups.append(key)
+            for element in value:
+                self.options.append(element.nombre)
+
+    def on_options_groups(self, instance, values):
+        _order = self._order
+        _widgets = self._widgets
+        for txt in values:
+            if txt not in _widgets:
+                _widgets[txt] = btn = MyLabel(text=txt, size_hint_y=None, height= 30)
+                _order.append(txt)
+    
+    def on_options(self, instance, values):
+        _order = self._order
+        _widgets = self._widgets
+        changed = False
+        for txt in values:
+            if txt not in _widgets:
+                _widgets[txt] = btn = Factory.DDButton(text=txt)
+                btn.bind()
+                _order.append(txt)
+                changed = True
+        for txt in _order[:]:
+            if txt not in values:
+                #_order.remove(txt)
+                #del _widgets[txt]
+                changed = True
+        if changed:
+            self.apply_filter(self._needle)
+
+    def apply_filter(self, needle):
+        self._needle = needle
+        self.clear_widgets()
+        _widgets = self._widgets
+        add_widget = self.add_widget
+        ign = self.ignore_case
+        _lcn = needle and needle.lower()
+        for haystack in self._order:
+            _lch = haystack.lower()
+            if not needle or ((ign and _lcn in _lch) or 
+                         (not ign and needle in haystack)):
+                if haystack in self.options_groups:
+                    index = self.options_groups.index(haystack)
+                    i = self._order.index(haystack)
+                    if index+1 != len(self.options_groups):
+                        j = self._order.index(self.options_groups[index+1])
+                        for element in self._order[i:j]:
+                            add_widget(_widgets[element])
+                    else:
+                        for element in self._order[i:]:
+                            add_widget(_widgets[element])
+                elif _widgets[haystack] not in self.container.children:
+                    add_widget(_widgets[haystack])  
+
+class FilterDDTrigger(Factory.BoxLayout):
+    def __init__(self, **kwargs):
+        super(FilterDDTrigger, self).__init__(**kwargs)
+        self._prev_dd = None
+        self._textinput = ti = Factory.TextInput(multiline=False, hint_text='Enter function name', size_hint=(0.5,None), height=30, pos_hint={'center_x':0.5, 'center_y':0.5}, 
+        background_color= (0.2, 0.2, 0.2, 1.0), foreground_color= (1,1,1,1), cursor_color= (1,1,1,1))
+        ti.bind(text=self._apply_filter)
+        ti.bind(on_text_validate=self._on_enter)
+        self._button = btn = Factory.Button(text=self.text, background_normal = '', background_down = '', background_disabled_normal= "", background_disabled_down= "")
+        btn.background_color= (0.2, 0.71, 0.9, 1) if btn.state == 'down' else (0.2, 0.2, 0.2, 1.0)
+        btn.bind(on_release=self._on_release)
+        self.add_widget(btn)
+
+    text = Factory.StringProperty('Open')
+    def on_text(self, instance, value):
+        self._button.text = value
+
+    dropdown = Factory.ObjectProperty(None, allownone=True)
+    def on_dropdown(self, instance, value):
+        _prev_dd = self._prev_dd
+        if value is _prev_dd:
+            return
+        if _prev_dd:
+            _prev_dd.unbind(on_dismiss=self._on_dismiss)
+            _prev_dd.unbind(on_select=self._on_select)
+        if value:
+            value.bind(on_dismiss=self._on_dismiss)
+            value.bind(on_select=self._on_select)
+        self._prev_dd = value
+
+    def _apply_filter(self, instance, text):
+        if self.dropdown:
+            self.dropdown.apply_filter(text)
+
+    def _on_release(self, *largs):
+        if not self.dropdown:
+            return
+        self.remove_widget(self._button)
+        self.add_widget(self._textinput)
+        self.dropdown.open(self)
+        self._textinput.focus = True
+
+    def _on_dismiss(self, *largs):
+        self.remove_widget(self._textinput)
+        self.add_widget(self._button)
+        self._textinput.text = ''
+
+    def _on_select(self, instance, value):
+        self.parent.parent.parent.new_bloque(value)
+
+    def _on_enter(self, *largs):
+        container = self.dropdown.container
+        if container.children:
+            self.dropdown.select(container.children[-1].text)
+        else:
+            self.dropdown.dismiss()
+
+class MyLabel(Label):
+    def __init__(self, **kwargs):
+        super(MyLabel, self).__init__(**kwargs)
+        pass
 
 if __name__ == '__main__':
     MyApp().run()

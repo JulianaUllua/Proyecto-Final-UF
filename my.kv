@@ -1,5 +1,6 @@
 #:kivy 1.1.0
 #: import Button kivy.uix.button.Button
+#:import F kivy.factory.Factory
 
 <MainFloatLayout>:
         id: mainfloat
@@ -12,11 +13,11 @@
                         cancel_handler_widget: mainfloat
 
                         AppMenuTextItem:
-                                text: 'Guardar imagen' #todavia no funciona
+                                text: 'Save Image' #todavia no funciona
                                 #on_release: root.show_save()
                                 ContextMenu:
                         AppMenuTextItem:
-                                text: 'Extraer Codigo' 
+                                text: 'Extract Code' 
                                 on_press: root.show_extraer_popup()
                                 on_release: root.Extract_Pipe_Code()
                                 ContextMenu:
@@ -31,36 +32,21 @@
                         AppMenuTextItem:
                                 text: 'Run Pipe'
                                 on_release: root.find_pipes()  
+                                ContextMenu: 
+                        AppMenuTextItem:
+                                text: 'Guardar Todo'
+                                #on_release: root.save_pipeline()
                                 ContextMenu:    
                 AppMenu:
                         id: tool_bar
                         top: root.height - top_menu.size[1]
                         cancel_handler_widget: mainfloat
 
-                        AppMenuTextItem:
+                        FilterDDTrigger:
+                                size_hint: 0.2, 1
                                 text: 'Tool Bar'
-                                ContextMenu:
-                                        id: funciones_box
-                                        visible: False
-
-                        TextInput:
-                        #self.ids.tool_bar.add_item(TextInput(hint_text= "enter function name", multiline= False, background_color= (0.2, 0.2, 0.2, 1.0), foreground_color= (1,1,1,1), cursor_color=(1,1,1,1)))
-                                id: search_function
-                                hint_text: "enter function name"
-                                multiline: False
-                                background_color: (0.2, 0.2, 0.2, 1.0)
-                                foreground_color: (1,1,1,1)
-                                cursor_color:(1,1,1,1)
-                                on_text_validate: root.search_function(self.text)
-                                size_hint: None, 1 #no modificar porque se mueve de lugar
-
-                        AppMenuTextItem:
-                                text: '>'
-                                id: search_funciones_release
-                                ContextMenu:
-                                        visible: False
-                                        id: search_funciones_box
-
+                                dropdown:
+                                        F.FilterDD()
                           
                 FloatLayout:
                         id: bloques_box
@@ -68,7 +54,7 @@
                         canvas:
                                 Color:
                                         rgba: 255, 255, 255, 255
-                                                    
+
 
 <MyScatterLayout>:
         
@@ -178,7 +164,67 @@
                         ContextMenuTextItem:
                                 text: "Edit outputs"
                                 on_release: root.add_outputs(root)
+
+<MenuScreen>:
+        canvas.before:
+                Rectangle:
+                        pos: self.pos
+                        size: self.size
+                        source:"icons\\background.jpg"
+        BoxLayout:
+                
+                size_hint: None, None
+                size: 350, 100
+                center: root.center
+                orientation: 'vertical'
+                Label:
+                        text: "ProtoPype"
+                        font_name: "Roboto"
+                        bold: True
+                        font_size:'20sp'
+                        Image:
+                                source:"icons\\pipe.png"
+                                center_x: self.parent.center_x + 60
+                                center_y: self.parent.center_y
+                                size: 25,25
+                Label:
+                        size_hint: 0.1,0.3 
+                Button:
+                        text: 'New'
+                        font_name: "Roboto"
+                        on_press: root.manager.current = 'main screen'
                         
+                        background_color: 0,0,0,0
+                        canvas.before:
+                                Color:
+                                        rgba: 1, 1, 1, 1
+                                Line:
+                                        width: 1
+                                        rounded_rectangle: self.x, self.y, self.width, self.height, 8, 100
+                        Image:
+                                source:"icons\\new.png"
+                                center_x: self.parent.center_x - 34
+                                center_y: self.parent.center_y
+                                size: 25,25
+                Label:
+                        size_hint: 0.1,0.3  
+                Button:
+                        text: 'Open'
+                        font_name: "Roboto"
+                        background_color: 0,0,0,0
+                        canvas.before:
+                                Color:
+                                        rgba: 1, 1, 1, 1
+                                Line:
+                                        width: 1
+                                        rounded_rectangle: self.x, self.y, self.width, self.height, 8, 100
+                        Image:
+                                source:"icons\\open.png"
+                                center_x: self.parent.center_x - 34
+                                center_y: self.parent.center_y
+                                size: 23,23
+
+
 <Parameters_Popup>:
         BoxLayout:
                 orientation:"horizontal"
@@ -461,8 +507,8 @@
                                 size_hint_y: None
                                 height: 30
                                 multiline: False
-                                #text: "C:/Users/trini/Pictures"
-                                text:"C:/Users/Juliana/Downloads"
+                                text: "C:/Users/trini/Pictures"
+                                #text:"C:/Users/Juliana/Downloads"
                                 #El text esta puesto por comodidad para nosotras. 
                                 #En un futuro deberiamos eliminarlo o dejar como ejemplo en hint_text
                                 on_text_validate: load.new_path(path_input.text)
@@ -570,3 +616,21 @@
                 size: 25,25
                 #allow_stretch: True
         
+<MyLabel>:
+        background_color: 0.2, 0.2, 0.2, 1.0
+        canvas.before:
+                Color:
+                        rgba: self.background_color
+                Rectangle:
+                        size: self.size
+                        pos: self.pos
+        #text properties
+        color: 0.7, 0.7, 0.7, 1.0
+        #outline_color: 0,0,0
+        #outline_width: 1
+
+<DDButton@Button>:
+        size_hint_y: None
+        height: '50dp'
+        # Double .parent because dropdown proxies add_widget to container
+        on_release: self.parent.parent.select(self.text)
