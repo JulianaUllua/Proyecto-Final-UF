@@ -1,5 +1,6 @@
 #:kivy 1.1.0
 #: import Button kivy.uix.button.Button
+#:import F kivy.factory.Factory
 
 <MainFloatLayout>:
         id: mainfloat
@@ -12,11 +13,11 @@
                         cancel_handler_widget: mainfloat
 
                         AppMenuTextItem:
-                                text: 'Guardar imagen' #todavia no funciona
+                                text: 'Save Image' #todavia no funciona
                                 #on_release: root.show_save()
                                 ContextMenu:
                         AppMenuTextItem:
-                                text: 'Extraer Codigo' 
+                                text: 'Extract Code' 
                                 on_press: root.show_extraer_popup()
                                 on_release: root.Extract_Pipe_Code()
                                 ContextMenu:
@@ -41,30 +42,11 @@
                         top: root.height - top_menu.size[1]
                         cancel_handler_widget: mainfloat
 
-                        AppMenuTextItem:
+                        FilterDDTrigger:
+                                size_hint: 0.2, 1
                                 text: 'Tool Bar'
-                                ContextMenu:
-                                        id: funciones_box
-                                        visible: False
-
-                        TextInput:
-                        #self.ids.tool_bar.add_item(TextInput(hint_text= "enter function name", multiline= False, background_color= (0.2, 0.2, 0.2, 1.0), foreground_color= (1,1,1,1), cursor_color=(1,1,1,1)))
-                                id: search_function
-                                hint_text: "enter function name"
-                                multiline: False
-                                background_color: (0.2, 0.2, 0.2, 1.0)
-                                foreground_color: (1,1,1,1)
-                                cursor_color:(1,1,1,1)
-                                on_text_validate: root.search_function(self.text)
-                                size_hint: None, 1 #no modificar porque se mueve de lugar
-
-                        AppMenuTextItem:
-                                text: '>'
-                                id: search_funciones_release
-                                ContextMenu:
-                                        visible: False
-                                        id: search_funciones_box
-
+                                dropdown:
+                                        F.FilterDD()
                           
                 FloatLayout:
                         id: bloques_box
@@ -634,3 +616,21 @@
                 size: 25,25
                 #allow_stretch: True
         
+<MyLabel>:
+        background_color: 0.2, 0.2, 0.2, 1.0
+        canvas.before:
+                Color:
+                        rgba: self.background_color
+                Rectangle:
+                        size: self.size
+                        pos: self.pos
+        #text properties
+        color: 0.7, 0.7, 0.7, 1.0
+        #outline_color: 0,0,0
+        #outline_width: 1
+
+<DDButton@Button>:
+        size_hint_y: None
+        height: '50dp'
+        # Double .parent because dropdown proxies add_widget to container
+        on_release: self.parent.parent.select(self.text)

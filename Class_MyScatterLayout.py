@@ -111,8 +111,6 @@ class Bloque:
                         
                 return list(self.outputs.values())
 
-
-       
         except NameError: 
             print("NameError: Hay un o mas bloque/s sin input/s. Verifique las uniones")
 
@@ -821,7 +819,6 @@ class MyCheckBox(ContextMenuItem, GridLayout):
     def on_checkbox_active(self,value):
         self.active = value
             
-
 class MyParameterButton(Button):
     def __init__(self, button_id, parameter_text, source, **kwargs):
         super(MyParameterButton, self).__init__(**kwargs)
@@ -831,7 +828,6 @@ class MyParameterButton(Button):
         self.ids.param_imag.source = source
         #Window.bind(mouse_pos=self.on_mouse_pos)# binding[subscribe]Event handling method of mouse position change
     
-
 class MyIconButton(Button):
     pass
 
