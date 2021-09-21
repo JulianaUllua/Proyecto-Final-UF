@@ -142,7 +142,7 @@ class MainFloatLayout(FloatLayout):
     scatter_count = 0 # para asignar id a scatter
     scatter_list = [] # guarda objetos scatter, vertices
     scatter_graph = {} # diccionario de grafo: {['key]:['value','value']}, key=scatter_id del output, value=scatter_id de los inputs con los que esté conectado
-    scatter_graph_string = [] # lista de grafo con type=string
+    #scatter_graph_string = [] # lista de grafo con type=string
     list_toposort = [] #lista de graph en orden de ejecucion 
     list_pipelines = [] #lista de pipelines creados
     start_blocks = [] # guarda objetos scatter del tipo Load Image, para comenzar los paths desde estos
@@ -166,8 +166,8 @@ class MainFloatLayout(FloatLayout):
         if value == "Load Image":
             self.start_blocks.append(scatter.scatter_id) # para comenzar los paths desde estos
             
-            filename = r'C:\Users\trini\Pictures\lena.png'
-            #filename = r'C:\Users\Juliana\Pictures\cell.png'
+            #filename = r'C:\Users\trini\Pictures\lena.png'
+            filename = r'C:\Users\Juliana\Pictures\cell.png'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
 
@@ -505,7 +505,36 @@ class MainFloatLayout(FloatLayout):
                                     elif group != list(self.list_toposort[-1]):
                                         pipeline.output_toinput(self.scatter_list[int(node)])
 
-    #def save_pipeline(self):
+    def save_pipeline(self):
+        
+        #importación de datos desde el json
+        
+        #copia de datos guardados
+        self.scatter_graph = scatter_graph
+        self.start_blocks = start_blocks
+        self.scats = scats
+        self.scatter_list = scatter_list
+        self.lines_list = lines_list
+
+        #set de variables        
+        #lines_array = [] # se llenaría con update lines?    
+        self.scatter_count = len(scatter_list) # para asignar id a scatter                   
+
+        #creación de bloques
+        for scatter in scatter_list:
+            if self.location < Window.system_size[0]* 0.8:
+                self.location = self.location + 165
+            else:
+                self.location= Window.system_size[0]*0.10
+            self.ids.bloques_box.add_widget(scatter)
+
+        #creación de líneas
+        for line in lines_list:
+            line.update_line(line.points)
+
+        #creación de pipelines
+        self.find_pipes()
+
 
 
 class MainFloatScreen(Screen):
@@ -577,7 +606,7 @@ class MyLine:
         self.line.add(Ellipse(pos=(points[1][0]-6, points[1][1]-5), size=(7,7)))
     
     def clear_lines(self):
-        self.line.clear()          
+        self.line.clear()
 
 
 class FilterDD(Factory.DropDown):
