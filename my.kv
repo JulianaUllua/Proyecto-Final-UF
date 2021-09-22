@@ -35,7 +35,11 @@
                                 ContextMenu: 
                         AppMenuTextItem:
                                 text: 'Guardar Todo'
-                                on_release: root.save_pipeline()
+                                on_release: root.to_file()
+                                ContextMenu:  
+                        AppMenuTextItem:
+                                text: 'Abrir Todo'
+                                on_release: root.from_file()
                                 ContextMenu:    
                 AppMenu:
                         id: tool_bar

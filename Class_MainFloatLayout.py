@@ -13,6 +13,7 @@ from numpy.lib.type_check import imag
 from toposort import toposort
 from concurrent import futures
 from concurrent.futures import ThreadPoolExecutor
+from collections import defaultdict
 
 matplotlib.use("module://kivy.garden.matplotlib.backend_kivy")
 import kivy.garden 
@@ -166,8 +167,8 @@ class MainFloatLayout(FloatLayout):
         if value == "Load Image":
             self.start_blocks.append(scatter.scatter_id) # para comenzar los paths desde estos
             
-            #filename = r'C:\Users\trini\Pictures\lena.png'
-            filename = r'C:\Users\Juliana\Pictures\cell.png'
+            filename = r'C:\Users\trini\Pictures\lena.png'
+            #filename = r'C:\Users\Juliana\Pictures\cell.png'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
 
@@ -508,7 +509,8 @@ class MainFloatLayout(FloatLayout):
     def save_pipeline(self):
         
         #importación de datos desde el json
-        
+        self.from_file()
+
         #copia de datos guardados
         self.scatter_graph = scatter_graph
         self.start_blocks = start_blocks
@@ -535,6 +537,71 @@ class MainFloatLayout(FloatLayout):
         #creación de pipelines
         self.find_pipes()
 
+    
+    def from_file(self):
+        with open("saved_file.json") as f:
+            data = json.load(f)
+            print(data)
+            print(type(data))
+        pass
+
+    def to_file(self):
+        try:
+            with open("saved_file.json", 'w') as f:
+                json.dump(self.lines_list, f, indent=4, ensure_ascii=False, cls=MyLineEncoder)
+        except Exception as ex:
+            print(ex)
+
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+       if isinstance(obj, set):
+          return list(obj)
+       return json.JSONEncoder.default(self, obj)
+
+class NumpyArrayEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+class MyLineEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, MyLine): # this is the item class you want to serialize
+            try:
+                property_dict = defaultdict(dict)
+                property_dict['scatter_output'] = obj.scatter_output
+                property_dict['scatter_input'] = obj.scatter_input
+
+                property_dict['button_output']['button_id'] = obj.button_output.button_id
+                property_dict['button_output']['parameter_text'] = obj.button_output.parameter_text
+                property_dict['button_output']['source'] = obj.button_output.source
+
+                property_dict['button_input']['button_id'] = "inputs"
+                #property_dict['button_input']['parameter_text'] = obj.button_input.parameter_text
+                #property_dict['button_input']['source'] = obj.button_input.source
+
+                property_dict['points'] = obj.points
+
+                #draw_line_pipe, update_line, delete_scatter, funcion, scatter_id
+                scatter_dict = defaultdict(dict)
+                scatter_dict['nombre'] = obj.scat_inp.funcion.nombre
+                scatter_dict['funcion'] = obj.scat_inp.funcion.funcion
+                scatter_dict['group'] = obj.scat_inp.funcion.group
+
+                property_dict['scat_inp']['funcion']= scatter_dict
+
+                #encodedNumpyData = json.dumps(obj.scat_inp.inputs, cls=NumpyArrayEncoder)  
+                #property_dict['scat_inp']['inputs'] = encodedNumpyData
+                property_dict['scat_inp']['parameters'] = obj.scat_inp.parameters
+                #property_dict['scat_inp']['outputs'] = obj.scat_inp.outputs
+                property_dict['scat_inp']['in_images'] = obj.scat_inp.in_images
+                property_dict['scat_inp']['out_images'] = obj.scat_inp.out_images
+                
+                return {'__MyLine__': property_dict} 
+            except TypeError:
+                pass
+        return json.JSONEncoder.default(self, obj)
 
 
 class MainFloatScreen(Screen):
