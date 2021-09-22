@@ -1,0 +1,158 @@
+{
+    "scatter_graph": {
+        "0": [
+            "1"
+        ],
+        "2": [
+            "3"
+        ]
+    },
+    "start_blocks": [
+        "0",
+        "2"
+    ],
+    "scats": [
+        "0",
+        "1",
+        "2",
+        "3"
+    ],
+    "scatter_list": [
+        {
+            "scatter": {
+                "nombre": "Load Image",
+                "funcion": "cv2.imread",
+                "group": "Input/Output",
+                "inputs": [
+                    "C:\\Users\\trini\\Pictures\\lena.png"
+                ],
+                "parameters": {},
+                "in_images": 0,
+                "out_images": 1
+            }
+        },
+        {
+            "scatter": {
+                "nombre": "Apply ColorMap",
+                "funcion": "cv2.applyColorMap",
+                "group": "Conversions",
+                "parameters": {
+                    "ColorMap": 0
+                },
+                "in_images": 1,
+                "out_images": 1
+            }
+        },
+        {
+            "scatter": {
+                "nombre": "Load Image",
+                "funcion": "cv2.imread",
+                "group": "Input/Output",
+                "inputs": [
+                    "C:\\Users\\trini\\Pictures\\lena.png"
+                ],
+                "parameters": {},
+                "in_images": 0,
+                "out_images": 1
+            }
+        },
+        {
+            "scatter": {
+                "nombre": "Gaussian Blur",
+                "funcion": "cv2.GaussianBlur",
+                "group": "Local Operations",
+                "parameters": {
+                    "ksize": [
+                        3,
+                        3
+                    ],
+                    "SigmaX": 0,
+                    "SigmaY": 0,
+                    "borderType": 4
+                },
+                "in_images": 1,
+                "out_images": 1
+            }
+        }
+    ],
+    "lines_list": [
+        {
+            "line": {
+                "scatter_output": "0",
+                "scatter_input": "1",
+                "button_output": {
+                    "button_id": "outputs",
+                    "parameter_text": "dst",
+                    "source": "c:\\Users\\trini\\OneDrive\\Favaloro\\Tesis\\Código\\Proyecto-Final-UF-1\\icons\\image_icon1.png"
+                },
+                "button_input": {
+                    "button_id": "inputs"
+                },
+                "points": [
+                    [
+                        330.0,
+                        423.75
+                    ],
+                    [
+                        345.0,
+                        423.75
+                    ]
+                ],
+                "scat_inp": {
+                    "funcion": {
+                        "nombre": "Apply ColorMap",
+                        "funcion": "cv2.applyColorMap",
+                        "group": "Conversions"
+                    },
+                    "parameters": {
+                        "ColorMap": 0
+                    },
+                    "in_images": 1,
+                    "out_images": 1
+                }
+            }
+        },
+        {
+            "line": {
+                "scatter_output": "2",
+                "scatter_input": "3",
+                "button_output": {
+                    "button_id": "outputs",
+                    "parameter_text": "dst",
+                    "source": "c:\\Users\\trini\\OneDrive\\Favaloro\\Tesis\\Código\\Proyecto-Final-UF-1\\icons\\image_icon1.png"
+                },
+                "button_input": {
+                    "button_id": "inputs"
+                },
+                "points": [
+                    [
+                        520.0,
+                        261.25
+                    ],
+                    [
+                        675.0,
+                        423.75
+                    ]
+                ],
+                "scat_inp": {
+                    "funcion": {
+                        "nombre": "Gaussian Blur",
+                        "funcion": "cv2.GaussianBlur",
+                        "group": "Local Operations"
+                    },
+                    "parameters": {
+                        "ksize": [
+                            3,
+                            3
+                        ],
+                        "SigmaX": 0,
+                        "SigmaY": 0,
+                        "borderType": 4
+                    },
+                    "in_images": 1,
+                    "out_images": 1
+                }
+            }
+        }
+    ]
+}

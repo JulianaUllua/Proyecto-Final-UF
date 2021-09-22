@@ -548,20 +548,81 @@ class MainFloatLayout(FloatLayout):
     def to_file(self):
         try:
             with open("saved_file.json", 'w') as f:
-                json.dump(self.lines_list, f, indent=4, ensure_ascii=False, cls=MyLineEncoder)
+                scatter_graph_dict = defaultdict(dict)
+                scatter_graph_dict['scatter_graph'] = self.scatter_graph
+                encoder = MultipleJsonEncoders(SetEncoder, MyLineEncoder, MyScatterLayoutEncoder, NumpyArrayEncoder)
+                json_data = {
+                    'scatter_graph' : self.scatter_graph,
+                    'start_blocks' : self.start_blocks,
+                    'scats' : self.scats,
+                    'scatter_list' : self.scatter_list,
+                    'lines_list' : self.lines_list
+                }
+                json.dump(json_data, f, indent=4, ensure_ascii=False, cls=encoder)
         except Exception as ex:
             print(ex)
+
+class MultipleJsonEncoders():
+    """
+    Combine multiple JSON encoders
+    """
+    def __init__(self, *encoders):
+        self.encoders = encoders
+        self.args = ()
+        self.kwargs = {}
+
+    def default(self, obj):
+        for encoder in self.encoders:
+            try:
+                return encoder(*self.args, **self.kwargs).default(obj)
+            except TypeError:
+                pass
+        raise TypeError(f'Object of type {obj.__class__.__name__} is not JSON serializable')
+
+    def __call__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+        enc = json.JSONEncoder(*args, **kwargs)
+        enc.default = self.default
+        return enc
+
 
 class SetEncoder(json.JSONEncoder):
     def default(self, obj):
        if isinstance(obj, set):
-          return list(obj)
+           return list(obj)
        return json.JSONEncoder.default(self, obj)
 
 class NumpyArrayEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+class MyScatterLayoutEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, CScatter.MyScatterLayout): # this is the item class you want to serialize
+            try:
+                scatter_dict = defaultdict(dict)
+                scatter_dict['nombre'] = obj.funcion.nombre
+                scatter_dict['funcion'] = obj.funcion.funcion
+                scatter_dict['group'] = obj.funcion.group
+
+                # por ahora decidi solo guardar el filename de los load image porq los arrays generados desp ocupan mucho espacio y podemos generarlos en output to input devuelta
+                if obj.funcion.nombre == "Load Image":
+                    scatter_dict['inputs'] = obj.inputs
+                scatter_dict['parameters'] = obj.parameters
+
+                # me parece que no hace falta guardarlo
+                #scatter_dict['outputs'] = obj.outputs
+
+                scatter_dict['in_images'] = obj.in_images
+                scatter_dict['out_images'] = obj.out_images
+                
+                return {'scatter': scatter_dict} 
+            except TypeError:
+                pass
         return json.JSONEncoder.default(self, obj)
 
 class MyLineEncoder(json.JSONEncoder):
@@ -583,7 +644,6 @@ class MyLineEncoder(json.JSONEncoder):
 
                 property_dict['points'] = obj.points
 
-                #draw_line_pipe, update_line, delete_scatter, funcion, scatter_id
                 scatter_dict = defaultdict(dict)
                 scatter_dict['nombre'] = obj.scat_inp.funcion.nombre
                 scatter_dict['funcion'] = obj.scat_inp.funcion.funcion
@@ -591,14 +651,14 @@ class MyLineEncoder(json.JSONEncoder):
 
                 property_dict['scat_inp']['funcion']= scatter_dict
 
-                #encodedNumpyData = json.dumps(obj.scat_inp.inputs, cls=NumpyArrayEncoder)  
-                #property_dict['scat_inp']['inputs'] = encodedNumpyData
+                
+                #property_dict['scat_inp']['inputs'] = obj.scat_inp.inputs
                 property_dict['scat_inp']['parameters'] = obj.scat_inp.parameters
                 #property_dict['scat_inp']['outputs'] = obj.scat_inp.outputs
                 property_dict['scat_inp']['in_images'] = obj.scat_inp.in_images
                 property_dict['scat_inp']['out_images'] = obj.scat_inp.out_images
                 
-                return {'__MyLine__': property_dict} 
+                return {'line': property_dict} 
             except TypeError:
                 pass
         return json.JSONEncoder.default(self, obj)
