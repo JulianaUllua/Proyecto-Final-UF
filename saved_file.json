@@ -3,19 +3,17 @@
         "0": [
             "1"
         ],
-        "2": [
-            "3"
+        "1": [
+            "2"
         ]
     },
     "start_blocks": [
-        "0",
-        "2"
+        "0"
     ],
     "scats": [
         "0",
         "1",
-        "2",
-        "3"
+        "2"
     ],
     "scatter_list": [
         {
@@ -33,11 +31,11 @@
         },
         {
             "scatter": {
-                "nombre": "Apply ColorMap",
-                "funcion": "cv2.applyColorMap",
+                "nombre": "Change Colorspace",
+                "funcion": "cv2.cvtColor",
                 "group": "Conversions",
                 "parameters": {
-                    "ColorMap": 0
+                    "Color": 6
                 },
                 "in_images": 1,
                 "out_images": 1
@@ -45,30 +43,11 @@
         },
         {
             "scatter": {
-                "nombre": "Load Image",
-                "funcion": "cv2.imread",
-                "group": "Input/Output",
-                "inputs": [
-                    "C:\\Users\\trini\\Pictures\\lena.png"
-                ],
-                "parameters": {},
-                "in_images": 0,
-                "out_images": 1
-            }
-        },
-        {
-            "scatter": {
-                "nombre": "Gaussian Blur",
-                "funcion": "cv2.GaussianBlur",
+                "nombre": "Median Blur",
+                "funcion": "cv2.medianBlur",
                 "group": "Local Operations",
                 "parameters": {
-                    "ksize": [
-                        3,
-                        3
-                    ],
-                    "SigmaX": 0,
-                    "SigmaY": 0,
-                    "borderType": 4
+                    "ksize": 13
                 },
                 "in_images": 1,
                 "out_images": 1
@@ -91,21 +70,21 @@
                 "points": [
                     [
                         330.0,
-                        423.75
+                        371.25
                     ],
                     [
                         345.0,
-                        423.75
+                        371.25
                     ]
                 ],
                 "scat_inp": {
                     "funcion": {
-                        "nombre": "Apply ColorMap",
-                        "funcion": "cv2.applyColorMap",
+                        "nombre": "Change Colorspace",
+                        "funcion": "cv2.cvtColor",
                         "group": "Conversions"
                     },
                     "parameters": {
-                        "ColorMap": 0
+                        "Color": 6
                     },
                     "in_images": 1,
                     "out_images": 1
@@ -114,8 +93,8 @@
         },
         {
             "line": {
-                "scatter_output": "2",
-                "scatter_input": "3",
+                "scatter_output": "1",
+                "scatter_input": "2",
                 "button_output": {
                     "button_id": "outputs",
                     "parameter_text": "dst",
@@ -126,28 +105,22 @@
                 },
                 "points": [
                     [
-                        520.0,
-                        261.25
+                        495.0,
+                        371.25
                     ],
                     [
-                        675.0,
-                        423.75
+                        510.0,
+                        371.25
                     ]
                 ],
                 "scat_inp": {
                     "funcion": {
-                        "nombre": "Gaussian Blur",
-                        "funcion": "cv2.GaussianBlur",
+                        "nombre": "Median Blur",
+                        "funcion": "cv2.medianBlur",
                         "group": "Local Operations"
                     },
                     "parameters": {
-                        "ksize": [
-                            3,
-                            3
-                        ],
-                        "SigmaX": 0,
-                        "SigmaY": 0,
-                        "borderType": 4
+                        "ksize": 13
                     },
                     "in_images": 1,
                     "out_images": 1

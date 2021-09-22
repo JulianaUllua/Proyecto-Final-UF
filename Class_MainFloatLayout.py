@@ -548,9 +548,6 @@ class MainFloatLayout(FloatLayout):
     def to_file(self):
         try:
             with open("saved_file.json", 'w') as f:
-                scatter_graph_dict = defaultdict(dict)
-                scatter_graph_dict['scatter_graph'] = self.scatter_graph
-                encoder = MultipleJsonEncoders(SetEncoder, MyLineEncoder, MyScatterLayoutEncoder, NumpyArrayEncoder)
                 json_data = {
                     'scatter_graph' : self.scatter_graph,
                     'start_blocks' : self.start_blocks,
@@ -558,7 +555,9 @@ class MainFloatLayout(FloatLayout):
                     'scatter_list' : self.scatter_list,
                     'lines_list' : self.lines_list
                 }
+                encoder = MultipleJsonEncoders(SetEncoder, MyLineEncoder, MyScatterLayoutEncoder, NumpyArrayEncoder)
                 json.dump(json_data, f, indent=4, ensure_ascii=False, cls=encoder)
+
         except Exception as ex:
             print(ex)
 
