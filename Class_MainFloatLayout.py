@@ -13,6 +13,7 @@ from numpy.lib.type_check import imag
 from toposort import toposort
 from concurrent import futures
 from concurrent.futures import ThreadPoolExecutor
+from collections import defaultdict
 
 matplotlib.use("module://kivy.garden.matplotlib.backend_kivy")
 import kivy.garden 
@@ -67,7 +68,10 @@ class MyApp(App):
         mf = MainFloatScreen(name= 'main screen')
         mf.add_widget(MainFloatLayout())
         sm.add_widget(mf)
+        sm.add_widget(SavedFloatScreen(name = "saved screen"))
+
         sm.add_widget(MenuScreen(name='menu screen'))
+        
         sm.current = 'menu screen'
 
         return sm
@@ -142,7 +146,7 @@ class MainFloatLayout(FloatLayout):
     scatter_count = 0 # para asignar id a scatter
     scatter_list = [] # guarda objetos scatter, vertices
     scatter_graph = {} # diccionario de grafo: {['key]:['value','value']}, key=scatter_id del output, value=scatter_id de los inputs con los que esté conectado
-    scatter_graph_string = [] # lista de grafo con type=string
+    #scatter_graph_string = [] # lista de grafo con type=string
     list_toposort = [] #lista de graph en orden de ejecucion 
     list_pipelines = [] #lista de pipelines creados
     start_blocks = [] # guarda objetos scatter del tipo Load Image, para comenzar los paths desde estos
@@ -170,6 +174,7 @@ class MainFloatLayout(FloatLayout):
             #filename = r'C:\Users\Juliana\Pictures\cell.png'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
+        return scatter
 
     def draw_line_pipe(self, myscatter, button_id, instance):
         pos = instance.pos # posicion del boton
@@ -271,8 +276,10 @@ class MainFloatLayout(FloatLayout):
         
         #try:
         self.list_pipelines = []
+        print(self.scatter_graph)
         # se ordena el graph en orden según dependencias
         self.list_toposort = list(toposort(self.scatter_graph))
+        
         self.list_toposort.reverse() # lista guarda en orden en que hay que ejecutar los bloques
         print("toposort:", str(self.list_toposort))
         
@@ -297,20 +304,6 @@ class MainFloatLayout(FloatLayout):
                     print("Path no encontrado")
         
         self.run_pipes()
-
-        #except IndexError:
-        #    print("IndexError: Debe unir por lo menos dos bloques")
-    def from_file(self,filename):
-        
-        pass
-
-    def to_file(self,filename):
-        try:
-            with open("pepe.json") as f:
-                json.dump(self, f, indent=4, ensure_ascii=False)
-        except Exception as ex:
-            print(ex)
-
 
 
     def run_pipes(self): 
@@ -506,11 +499,188 @@ class MainFloatLayout(FloatLayout):
                                         pipeline.output_toinput(self.scatter_list[int(node)], line)
                                     elif group != list(self.list_toposort[-1]):
                                         pipeline.output_toinput(self.scatter_list[int(node)])
+    """
+    def save_pipeline(self):
+        
+        #importación de datos desde el json
 
-    #def save_pipeline(self):
+        #copia de datos guardados
+        self.scatter_graph = scatter_graph
+        self.start_blocks = start_blocks
+        self.scats = scats
+        self.scatter_list = scatter_list
+        self.lines_list = lines_list
+
+        #set de variables        
+        #lines_array = [] # se llenaría con update lines?    
+        self.scatter_count = len(scatter_list) # para asignar id a scatter                   
+
+        #creación de bloques
+        for scatter in scatter_list:
+            if self.location < Window.system_size[0]* 0.8:
+                self.location = self.location + 165
+            else:
+                self.location= Window.system_size[0]*0.10
+            self.ids.bloques_box.add_widget(scatter)
+
+        #creación de líneas
+        for line in lines_list:
+            line.update_line(line.points)
+
+        #creación de pipelines
+        self.find_pipes()
+    """
+    
+    def from_file(self):
+        with open("saved_file.json") as f:
+            data = json.load(f)
+            scatter_g = (data['scatter_graph'])
+            self.scatter_graph = {}
+            for key, value in scatter_g.items():
+                self.scatter_graph[key] = set(value)
+            self.start_blocks = data['start_blocks']
+            self.scats = data['scats']
+            
+            for item in data["scatter_list"]:
+                scatter = self.new_bloque(item['scatter']['nombre'])
+                for button in scatter.ids.inputs.children:
+                    if isinstance(button, CScatter.MyParameterButton):
+                        input = button
+                    if isinstance(button, CScatter.MyIconButton):
+                        input = button
+                for button in scatter.ids.outputs.children:
+                    if isinstance(button, CScatter.MyParameterButton):
+                        output = button
+
+            for item in data["lines_list"]:
+                myline = MyLine(item['line']['scatter_output'], item['line']['scatter_input'], output, input, item['line']['points'], scatter)
+                self.lines_list.append(myline) 
+                self.ids.bloques_box.canvas.add(myline.line)
+        
+        self.find_pipes()
+
+                        
+
+    def to_file(self):
+        try:
+            with open("saved_file.json", 'w') as f:
+                json_data = {
+                    'scatter_graph' : self.scatter_graph,
+                    'start_blocks' : self.start_blocks,
+                    'scats' : self.scats,
+                    'scatter_list' : self.scatter_list,
+                    'lines_list' : self.lines_list
+                }
+                encoder = MultipleJsonEncoders(SetEncoder, MyLineEncoder, MyScatterLayoutEncoder, NumpyArrayEncoder)
+                json.dump(json_data, f, indent=4, ensure_ascii=False, cls=encoder)
+
+        except Exception as ex:
+            print(ex)
+
+class MultipleJsonEncoders():
+    #Combine multiple JSON encoders
+
+    def __init__(self, *encoders):
+        self.encoders = encoders
+        self.args = ()
+        self.kwargs = {}
+
+    def default(self, obj):
+        for encoder in self.encoders:
+            try:
+                return encoder(*self.args, **self.kwargs).default(obj)
+            except TypeError:
+                pass
+        raise TypeError(f'Object of type {obj.__class__.__name__} is not JSON serializable')
+
+    def __call__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+        enc = json.JSONEncoder(*args, **kwargs)
+        enc.default = self.default
+        return enc
+
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+       if isinstance(obj, set):
+           return list(obj)
+
+       return json.JSONEncoder.default(self, obj)
+
+class NumpyArrayEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+class MyScatterLayoutEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, CScatter.MyScatterLayout): # this is the item class you want to serialize
+            try:
+                scatter_dict = defaultdict(dict)
+                scatter_dict['nombre'] = obj.funcion.nombre
+                scatter_dict['funcion'] = obj.funcion.funcion
+                scatter_dict['group'] = obj.funcion.group
+
+                # por ahora decidi solo guardar el filename de los load image porq los arrays generados desp ocupan mucho espacio y podemos generarlos en output to input devuelta
+                if obj.funcion.nombre == "Load Image":
+                    scatter_dict['inputs'] = obj.inputs
+                scatter_dict['parameters'] = obj.parameters
+
+                scatter_dict['in_images'] = obj.in_images
+                scatter_dict['out_images'] = obj.out_images
+                
+                return {'scatter': scatter_dict} 
+            except TypeError:
+                pass
+        return json.JSONEncoder.default(self, obj)
+
+class MyLineEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, MyLine): # this is the item class you want to serialize
+            try:
+                property_dict = defaultdict(dict)
+                property_dict['scatter_output'] = obj.scatter_output
+                property_dict['scatter_input'] = obj.scatter_input
+
+                #property_dict['button_output']['button_id'] = obj.button_output.button_id
+                #property_dict['button_output']['parameter_text'] = obj.button_output.parameter_text
+                #property_dict['button_output']['source'] = obj.button_output.source
+
+                #property_dict['button_input']['button_id'] = "inputs"
+
+                property_dict['points'] = obj.points
+
+                scatter_dict = defaultdict(dict)
+                scatter_dict['nombre'] = obj.scat_inp.funcion.nombre
+                scatter_dict['funcion'] = obj.scat_inp.funcion.funcion
+                scatter_dict['group'] = obj.scat_inp.funcion.group
+
+                property_dict['scat_inp']['funcion']= scatter_dict
+
+                
+                #property_dict['scat_inp']['inputs'] = obj.scat_inp.inputs
+                property_dict['scat_inp']['parameters'] = obj.scat_inp.parameters
+                #property_dict['scat_inp']['outputs'] = obj.scat_inp.outputs
+                property_dict['scat_inp']['in_images'] = obj.scat_inp.in_images
+                property_dict['scat_inp']['out_images'] = obj.scat_inp.out_images
+                
+                return {'line': property_dict} 
+            except TypeError:
+                pass
+        return json.JSONEncoder.default(self, obj)
 
 
 class MainFloatScreen(Screen):
+    pass
+
+class SavedFloatScreen(Screen):
+    def fileload(self):
+        mf = MainFloatLayout()
+        self.add_widget(mf)
+        mf.from_file()
     pass
 
 class MenuScreen(Screen):
@@ -579,7 +749,7 @@ class MyLine:
         self.line.add(Ellipse(pos=(points[1][0]-6, points[1][1]-5), size=(7,7)))
     
     def clear_lines(self):
-        self.line.clear()          
+        self.line.clear()
 
 
 class FilterDD(Factory.DropDown):

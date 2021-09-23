@@ -35,8 +35,8 @@
                                 ContextMenu: 
                         AppMenuTextItem:
                                 text: 'Guardar Todo'
-                                #on_release: root.save_pipeline()
-                                ContextMenu:    
+                                on_release: root.to_file()
+                                ContextMenu:  
                 AppMenu:
                         id: tool_bar
                         top: root.height - top_menu.size[1]
@@ -165,6 +165,12 @@
                                 text: "Edit outputs"
                                 on_release: root.add_outputs(root)
 
+
+<SavedFloatScreen>:
+        on_enter: root.fileload()
+        MainFloatLayout:
+
+
 <MenuScreen>:
         canvas.before:
                 Rectangle:
@@ -211,6 +217,9 @@
                 Button:
                         text: 'Open'
                         font_name: "Roboto"
+                        on_press: root.manager.current = 'saved screen'
+                        
+
                         background_color: 0,0,0,0
                         canvas.before:
                                 Color:

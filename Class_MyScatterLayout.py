@@ -41,6 +41,7 @@ from kivy_garden.contextmenu import ContextMenuItem
 # esta linea arregla poder llamar atributos de Bloque en MyScatter
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+#bloque
 
 class Bloque:
     colorfmt = 'bgr'
