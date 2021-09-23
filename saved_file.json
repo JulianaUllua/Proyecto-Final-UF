@@ -59,22 +59,14 @@
             "line": {
                 "scatter_output": "0",
                 "scatter_input": "1",
-                "button_output": {
-                    "button_id": "outputs",
-                    "parameter_text": "dst",
-                    "source": "c:\\Users\\trini\\OneDrive\\Favaloro\\Tesis\\Código\\Proyecto-Final-UF-1\\icons\\image_icon1.png"
-                },
-                "button_input": {
-                    "button_id": "inputs"
-                },
                 "points": [
                     [
                         330.0,
-                        371.25
+                        423.75
                     ],
                     [
                         345.0,
-                        371.25
+                        423.75
                     ]
                 ],
                 "scat_inp": {
@@ -95,22 +87,14 @@
             "line": {
                 "scatter_output": "1",
                 "scatter_input": "2",
-                "button_output": {
-                    "button_id": "outputs",
-                    "parameter_text": "dst",
-                    "source": "c:\\Users\\trini\\OneDrive\\Favaloro\\Tesis\\Código\\Proyecto-Final-UF-1\\icons\\image_icon1.png"
-                },
-                "button_input": {
-                    "button_id": "inputs"
-                },
                 "points": [
                     [
                         495.0,
-                        371.25
+                        423.75
                     ],
                     [
                         510.0,
-                        371.25
+                        421.25
                     ]
                 ],
                 "scat_inp": {

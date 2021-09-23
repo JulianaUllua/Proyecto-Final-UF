@@ -68,7 +68,10 @@ class MyApp(App):
         mf = MainFloatScreen(name= 'main screen')
         mf.add_widget(MainFloatLayout())
         sm.add_widget(mf)
+        sm.add_widget(SavedFloatScreen(name = "saved screen"))
+
         sm.add_widget(MenuScreen(name='menu screen'))
+        
         sm.current = 'menu screen'
 
         return sm
@@ -171,6 +174,7 @@ class MainFloatLayout(FloatLayout):
             #filename = r'C:\Users\Juliana\Pictures\cell.png'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
+        return scatter
 
     def draw_line_pipe(self, myscatter, button_id, instance):
         pos = instance.pos # posicion del boton
@@ -272,8 +276,10 @@ class MainFloatLayout(FloatLayout):
         
         #try:
         self.list_pipelines = []
+        print(self.scatter_graph)
         # se ordena el graph en orden según dependencias
         self.list_toposort = list(toposort(self.scatter_graph))
+        
         self.list_toposort.reverse() # lista guarda en orden en que hay que ejecutar los bloques
         print("toposort:", str(self.list_toposort))
         
@@ -298,18 +304,6 @@ class MainFloatLayout(FloatLayout):
                     print("Path no encontrado")
         
         self.run_pipes()
-
-    def from_file(self,filename):
-        
-        pass
-
-    def to_file(self,filename):
-        try:
-            with open("pepe.json") as f:
-                json.dump(self, f, indent=4, ensure_ascii=False)
-        except Exception as ex:
-            print(ex)
-
 
 
     def run_pipes(self): 
@@ -505,11 +499,10 @@ class MainFloatLayout(FloatLayout):
                                         pipeline.output_toinput(self.scatter_list[int(node)], line)
                                     elif group != list(self.list_toposort[-1]):
                                         pipeline.output_toinput(self.scatter_list[int(node)])
-
+    """
     def save_pipeline(self):
         
         #importación de datos desde el json
-        self.from_file()
 
         #copia de datos guardados
         self.scatter_graph = scatter_graph
@@ -536,14 +529,37 @@ class MainFloatLayout(FloatLayout):
 
         #creación de pipelines
         self.find_pipes()
-
+    """
     
     def from_file(self):
         with open("saved_file.json") as f:
             data = json.load(f)
-            print(data)
-            print(type(data))
-        pass
+            scatter_g = (data['scatter_graph'])
+            self.scatter_graph = {}
+            for key, value in scatter_g.items():
+                self.scatter_graph[key] = set(value)
+            self.start_blocks = data['start_blocks']
+            self.scats = data['scats']
+            
+            for item in data["scatter_list"]:
+                scatter = self.new_bloque(item['scatter']['nombre'])
+                for button in scatter.ids.inputs.children:
+                    if isinstance(button, CScatter.MyParameterButton):
+                        input = button
+                    if isinstance(button, CScatter.MyIconButton):
+                        input = button
+                for button in scatter.ids.outputs.children:
+                    if isinstance(button, CScatter.MyParameterButton):
+                        output = button
+
+            for item in data["lines_list"]:
+                myline = MyLine(item['line']['scatter_output'], item['line']['scatter_input'], output, input, item['line']['points'], scatter)
+                self.lines_list.append(myline) 
+                self.ids.bloques_box.canvas.add(myline.line)
+        
+        self.find_pipes()
+
+                        
 
     def to_file(self):
         try:
@@ -562,9 +578,8 @@ class MainFloatLayout(FloatLayout):
             print(ex)
 
 class MultipleJsonEncoders():
-    """
-    Combine multiple JSON encoders
-    """
+    #Combine multiple JSON encoders
+
     def __init__(self, *encoders):
         self.encoders = encoders
         self.args = ()
@@ -585,11 +600,11 @@ class MultipleJsonEncoders():
         enc.default = self.default
         return enc
 
-
 class SetEncoder(json.JSONEncoder):
     def default(self, obj):
        if isinstance(obj, set):
            return list(obj)
+
        return json.JSONEncoder.default(self, obj)
 
 class NumpyArrayEncoder(json.JSONEncoder):
@@ -613,9 +628,6 @@ class MyScatterLayoutEncoder(json.JSONEncoder):
                     scatter_dict['inputs'] = obj.inputs
                 scatter_dict['parameters'] = obj.parameters
 
-                # me parece que no hace falta guardarlo
-                #scatter_dict['outputs'] = obj.outputs
-
                 scatter_dict['in_images'] = obj.in_images
                 scatter_dict['out_images'] = obj.out_images
                 
@@ -633,13 +645,11 @@ class MyLineEncoder(json.JSONEncoder):
                 property_dict['scatter_output'] = obj.scatter_output
                 property_dict['scatter_input'] = obj.scatter_input
 
-                property_dict['button_output']['button_id'] = obj.button_output.button_id
-                property_dict['button_output']['parameter_text'] = obj.button_output.parameter_text
-                property_dict['button_output']['source'] = obj.button_output.source
+                #property_dict['button_output']['button_id'] = obj.button_output.button_id
+                #property_dict['button_output']['parameter_text'] = obj.button_output.parameter_text
+                #property_dict['button_output']['source'] = obj.button_output.source
 
-                property_dict['button_input']['button_id'] = "inputs"
-                #property_dict['button_input']['parameter_text'] = obj.button_input.parameter_text
-                #property_dict['button_input']['source'] = obj.button_input.source
+                #property_dict['button_input']['button_id'] = "inputs"
 
                 property_dict['points'] = obj.points
 
@@ -664,6 +674,13 @@ class MyLineEncoder(json.JSONEncoder):
 
 
 class MainFloatScreen(Screen):
+    pass
+
+class SavedFloatScreen(Screen):
+    def fileload(self):
+        mf = MainFloatLayout()
+        self.add_widget(mf)
+        mf.from_file()
     pass
 
 class MenuScreen(Screen):
