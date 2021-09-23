@@ -14,6 +14,7 @@ from toposort import toposort
 from concurrent import futures
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
+from functools import partial
 
 matplotlib.use("module://kivy.garden.matplotlib.backend_kivy")
 import kivy.garden 
@@ -155,10 +156,13 @@ class MainFloatLayout(FloatLayout):
     def __init__(self, **kwargs):
         super(MainFloatLayout, self).__init__(**kwargs)
         
-    def new_bloque(self, value):
+    def new_bloque(self, value, scat_id = 0):
         Fun = CFunction.BuscarFuncion(value)
+        if scat_id == 0:
+            scat_id = str(self.scatter_count)
+
         scatter = CScatter.MyScatterLayout(draw_line_pipe = self.draw_line_pipe, update_line = self.update_line, delete_scatter = self.delete_scatter, 
-                funcion = Fun, size=(150, 150), scatter_id = str(self.scatter_count),  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
+                funcion = Fun, scatter_id = scat_id ,size=(150, 150) ,  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
         if self.location < Window.system_size[0]* 0.8:
             self.location = self.location + 165
         else:
@@ -418,10 +422,17 @@ class MainFloatLayout(FloatLayout):
                 secondfile.write("\ncv2.imshow('Imagen Resultado', img_{})\ncv2.waitKey(0)".format(n))  
                 secondfile.write("\n")
 
-    def show_extraer_popup(self):
+    def show_extraer_popup(self, s = ""):
         show = Popup_Extraer_Codigo(self)
-        self.extraer_popup = Popup(title="Extraer Codigo", content=show,size_hint=(None,None),size=(400,150))
+        if s != "save":  
+            self.extraer_popup = Popup(title="Extraer Codigo", content=show,size_hint=(None,None),size=(400,150))
+        else:
+            box = BoxLayout(orientation = "horizontal")
+            button = Save_workspace_button(self)
+            box.add_widget(button)
+            self.extraer_popup = Popup(title="Save Pipeline As", content=box,size_hint=(None,None),size=(400,120))
         self.extraer_popup.open()
+
 
     def image_viewer(self):
         iv = ImageViewer()
@@ -530,9 +541,23 @@ class MainFloatLayout(FloatLayout):
         #creación de pipelines
         self.find_pipes()
     """
-    
-    def from_file(self):
-        with open("saved_file.json") as f:
+    def show_from_file_popup(self):
+        box = BoxLayout(orientation = "vertical")
+        dir = str(Path(__file__).parent.absolute())
+        with os.scandir(dir + '\\saved_pipelines') as json_files:
+            for element in json_files:
+                button = Button(text = str(element.name))
+                box.add_widget(button)
+                buttoncallbackin = partial(self.from_file, str(element.name))
+                button.bind(on_press = buttoncallbackin )
+
+        self.from_file_popup = Popup(title="Open workspace", content=box,size_hint=(None,None), size = (500,500))
+        self.from_file_popup.open()
+
+    def from_file(self, filename, *args):
+        self.from_file_popup.dismiss()
+        dir = str(Path(__file__).parent.absolute())
+        with open(dir + "\\saved_pipelines\\%s" %filename) as f:
             data = json.load(f)
             scatter_g = (data['scatter_graph'])
             self.scatter_graph = {}
@@ -542,15 +567,18 @@ class MainFloatLayout(FloatLayout):
             self.scats = data['scats']
             
             for item in data["scatter_list"]:
-                scatter = self.new_bloque(item['scatter']['nombre'])
-                for button in scatter.ids.inputs.children:
-                    if isinstance(button, CScatter.MyParameterButton):
-                        input = button
-                    if isinstance(button, CScatter.MyIconButton):
-                        input = button
-                for button in scatter.ids.outputs.children:
-                    if isinstance(button, CScatter.MyParameterButton):
-                        output = button
+                if item is not None:
+                    scatter = self.new_bloque(item['scatter']['nombre'],item['scatter']['scatter_id'])
+                    scatter.parameters = (item['scatter']['parameters'])
+                    scatter.pos = item['scatter']['pos']
+                    for button in scatter.ids.inputs.children:
+                        if isinstance(button, CScatter.MyParameterButton):
+                            input = button
+                        if isinstance(button, CScatter.MyIconButton):
+                            input = button
+                    for button in scatter.ids.outputs.children:
+                        if isinstance(button, CScatter.MyParameterButton):
+                            output = button
 
             for item in data["lines_list"]:
                 myline = MyLine(item['line']['scatter_output'], item['line']['scatter_input'], output, input, item['line']['points'], scatter)
@@ -561,18 +589,20 @@ class MainFloatLayout(FloatLayout):
 
                         
 
-    def to_file(self):
+    def to_file(self, filename):
+        self.extraer_popup.dismiss()
         try:
-            with open("saved_file.json", 'w') as f:
-                json_data = {
-                    'scatter_graph' : self.scatter_graph,
-                    'start_blocks' : self.start_blocks,
-                    'scats' : self.scats,
-                    'scatter_list' : self.scatter_list,
-                    'lines_list' : self.lines_list
-                }
-                encoder = MultipleJsonEncoders(SetEncoder, MyLineEncoder, MyScatterLayoutEncoder, NumpyArrayEncoder)
-                json.dump(json_data, f, indent=4, ensure_ascii=False, cls=encoder)
+            dir = str(Path(__file__).parent.absolute())
+            with open(dir + '\\saved_pipelines\\%s.json' % filename, 'w') as f:
+                    json_data = {
+                        'scatter_graph' : self.scatter_graph,
+                        'start_blocks' : self.start_blocks,
+                        'scats' : self.scats,
+                        'scatter_list' : self.scatter_list,
+                        'lines_list' : self.lines_list
+                    }
+                    encoder = MultipleJsonEncoders(SetEncoder, MyLineEncoder, MyScatterLayoutEncoder, NumpyArrayEncoder)
+                    json.dump(json_data, f, indent=4, ensure_ascii=False, cls=encoder)
 
         except Exception as ex:
             print(ex)
@@ -627,6 +657,8 @@ class MyScatterLayoutEncoder(json.JSONEncoder):
                 if obj.funcion.nombre == "Load Image":
                     scatter_dict['inputs'] = obj.inputs
                 scatter_dict['parameters'] = obj.parameters
+                scatter_dict['scatter_id'] = obj.scatter_id
+                scatter_dict['pos'] = obj.pos
 
                 scatter_dict['in_images'] = obj.in_images
                 scatter_dict['out_images'] = obj.out_images
@@ -645,12 +677,6 @@ class MyLineEncoder(json.JSONEncoder):
                 property_dict['scatter_output'] = obj.scatter_output
                 property_dict['scatter_input'] = obj.scatter_input
 
-                #property_dict['button_output']['button_id'] = obj.button_output.button_id
-                #property_dict['button_output']['parameter_text'] = obj.button_output.parameter_text
-                #property_dict['button_output']['source'] = obj.button_output.source
-
-                #property_dict['button_input']['button_id'] = "inputs"
-
                 property_dict['points'] = obj.points
 
                 scatter_dict = defaultdict(dict)
@@ -661,9 +687,7 @@ class MyLineEncoder(json.JSONEncoder):
                 property_dict['scat_inp']['funcion']= scatter_dict
 
                 
-                #property_dict['scat_inp']['inputs'] = obj.scat_inp.inputs
                 property_dict['scat_inp']['parameters'] = obj.scat_inp.parameters
-                #property_dict['scat_inp']['outputs'] = obj.scat_inp.outputs
                 property_dict['scat_inp']['in_images'] = obj.scat_inp.in_images
                 property_dict['scat_inp']['out_images'] = obj.scat_inp.out_images
                 
@@ -680,7 +704,7 @@ class SavedFloatScreen(Screen):
     def fileload(self):
         mf = MainFloatLayout()
         self.add_widget(mf)
-        mf.from_file()
+        mf.show_from_file_popup()
     pass
 
 class MenuScreen(Screen):
@@ -880,6 +904,12 @@ class MyLabel(Label):
     def __init__(self, **kwargs):
         super(MyLabel, self).__init__(**kwargs)
         pass
+
+class Save_workspace_button(BoxLayout):
+    def __init__(self, floatlayout, **kwargs):
+        super(Save_workspace_button, self).__init__(**kwargs)
+        self.mainfloat = floatlayout
+    pass
 
 if __name__ == '__main__':
     MyApp().run()

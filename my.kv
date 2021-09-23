@@ -34,8 +34,9 @@
                                 on_release: root.find_pipes()  
                                 ContextMenu: 
                         AppMenuTextItem:
-                                text: 'Guardar Todo'
-                                on_release: root.to_file()
+                                text: 'Save Workspace'
+                                on_press: root.show_extraer_popup("save")
+                                #on_release: root.to_file("saved_file")
                                 ContextMenu:  
                 AppMenu:
                         id: tool_bar
@@ -556,6 +557,19 @@
                 text: "Su codigo se ha exportado exitosamente"
                 size_hint: None, None
                 pos_hint: {"x":0.35, "top":1}
+
+<Save_workspace_button>:
+        TextInput:
+                id: filename_input
+                size_hint: .7,.9
+                multiline: False
+                text: "saved_file"
+                on_text_validate: root.mainfloat.to_file(filename_input.text)
+                            
+        Button:
+                text: "Save"
+                size_hint: .3,.9
+                on_press: root.mainfloat.to_file(filename_input.text)
 
 <ImageViewer>:
         do_default_tab: False
