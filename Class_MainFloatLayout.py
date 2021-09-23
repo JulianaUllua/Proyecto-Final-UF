@@ -590,6 +590,7 @@ class MainFloatLayout(FloatLayout):
                         
 
     def to_file(self, filename):
+        self.extraer_popup.dismiss()
         try:
             dir = str(Path(__file__).parent.absolute())
             with open(dir + '\\saved_pipelines\\%s.json' % filename, 'w') as f:
