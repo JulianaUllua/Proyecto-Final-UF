@@ -3,6 +3,7 @@ import kivy
 import os
 from pathlib import Path
 from kivy.core import window
+from kivy.uix.behaviors.button import ButtonBehavior
 from kivy_garden.contextmenu.context_menu import ContextMenuDivider
 import numpy as np
 import matplotlib
@@ -170,81 +171,86 @@ class MainFloatLayout(FloatLayout):
         if value == "Load Image":
             self.start_blocks.append(scatter.scatter_id) # para comenzar los paths desde estos
             
-            filename = r'C:\Users\trini\Pictures\lena.png'
-            #filename = r'C:\Users\Juliana\Pictures\cell.png'
+            #filename = r'C:\Users\trini\Pictures\lena.png'
+            filename = r'C:\Users\Juliana\Pictures\cell.png'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
         return scatter
 
     def draw_line_pipe(self, myscatter, button_id, instance):
-        pos = instance.pos # posicion del boton
-
-        if button_id == "outputs":
-            self.myscatter_aux = myscatter #guardo myscatter para después unirlo
-            self.button_output_aux = instance
-            mypos = [myscatter.pos[0] + pos[0] + instance.size[0], myscatter.pos[1] + pos[1] + instance.size[1]/2] #suma posicion del myscatter + posicion del button
-            self.line_flag = False
+        if instance.last_touch.button =='right':
             for line in self.lines_list:
-                if line.button_output == instance:
-                    self.line_flag = True
-                    break
+                if instance == line.button_output or instance == line.button_input:
+                    self.popup_delete_line(line)
+        else:
+            pos = instance.pos # posicion del boton
 
-            if not self.line_flag:
-                if myscatter.scatter_id in self.scats: #ver. se lo remueve de las listas para ponerlo en una nueva posicion, pero en caso de ser una segunda unión no habria que eliminarlo
-                    i = self.scats.index(myscatter.scatter_id) 
-                    self.scats.remove(myscatter.scatter_id)
-                    self.lines_array.pop(i)
-                self.scats.append(myscatter.scatter_id) #se lo agrega a las listas en nueva posicion
-                i = self.scats.index(myscatter.scatter_id)
-                self.set_list(i,mypos, self.lines_array) #equivalente a self.lines_array.append(mypos)
+            if button_id == "outputs":
+                self.myscatter_aux = myscatter #guardo myscatter para después unirlo
+                self.button_output_aux = instance
+                mypos = [myscatter.pos[0] + pos[0] + instance.size[0], myscatter.pos[1] + pos[1] + instance.size[1]/2] #suma posicion del myscatter + posicion del button
+                self.line_flag = False
+                for line in self.lines_list:
+                    if line.button_output == instance:
+                        self.line_flag = True
+                        break
 
-                if myscatter.scatter_id not in self.scatter_graph:
-                    #self.set_list(myscatter.scatter_id,{},self.scatter_graph) #equivalente a Function: Add Vertex
-                    self.scatter_graph[myscatter.scatter_id] = set()
+                if not self.line_flag:
+                    if myscatter.scatter_id in self.scats: #ver. se lo remueve de las listas para ponerlo en una nueva posicion, pero en caso de ser una segunda unión no habria que eliminarlo
+                        i = self.scats.index(myscatter.scatter_id) 
+                        self.scats.remove(myscatter.scatter_id)
+                        self.lines_array.pop(i)
+                    self.scats.append(myscatter.scatter_id) #se lo agrega a las listas en nueva posicion
+                    i = self.scats.index(myscatter.scatter_id)
+                    self.set_list(i,mypos, self.lines_array) #equivalente a self.lines_array.append(mypos)
 
-        elif button_id == "inputs" or "input_parameter":
-            if self.myscatter_aux != 0: #si hay un scatter para unir
-                if self.line_flag:
-                    for line in self.lines_list:
-                        if line.button_output == self.button_output_aux:
-                            for key, value in self.scatter_graph.items():
-                                if key == line.scatter_output:
-                                    value_to_pop = line.scatter_input
-                                    self.scatter_graph[line.scatter_output].remove(value_to_pop)
-                                    break
-                            self.lines_list.remove(line)
-                            mypos1 = line.points[0]
-                            line.clear_lines()
-                            del line
-                            break
+                    if myscatter.scatter_id not in self.scatter_graph:
+                        #self.set_list(myscatter.scatter_id,{},self.scatter_graph) #equivalente a Function: Add Vertex
+                        self.scatter_graph[myscatter.scatter_id] = set()
+
+            elif button_id == "inputs" or "input_parameter":
+                if self.myscatter_aux != 0: #si hay un scatter para unir
+                    if self.line_flag:
+                        for line in self.lines_list:
+                            if line.button_output == self.button_output_aux:
+                                for key, value in self.scatter_graph.items():
+                                    if key == line.scatter_output:
+                                        value_to_pop = line.scatter_input
+                                        self.scatter_graph[line.scatter_output].remove(value_to_pop)
+                                        break
+                                self.lines_list.remove(line)
+                                mypos1 = line.points[0]
+                                line.clear_lines()
+                                del line
+                                break
+                        
+                    mypos = [myscatter.pos[0] + pos[0], myscatter.pos[1] + pos[1] + instance.size[1]/2]
                     
-                mypos = [myscatter.pos[0] + pos[0], myscatter.pos[1] + pos[1] + instance.size[1]/2]
-                
-                if myscatter.scatter_id in self.scats:
-                    i = self.scats.index(myscatter.scatter_id)                    
-                    self.scats.remove(myscatter.scatter_id)
-                    self.lines_array.pop(i)
-                self.scats.append(myscatter.scatter_id)
-                i = self.scats.index(myscatter.scatter_id)
-                self.set_list(i,mypos, self.lines_array)
-                
-                if self.line_flag:
-                    points = [mypos1, mypos]
-                else:
-                    points = [self.lines_array[-2], self.lines_array[-1]]
-                myline = MyLine(self.myscatter_aux.scatter_id, myscatter.scatter_id, self.button_output_aux, instance, points, myscatter)
-                self.lines_list.append(myline) #equivalente a self.set_list(i, myline, self.lines_list)
-                self.ids.bloques_box.canvas.add(myline.line)
-                #equivalente a Function: Add Edge
+                    if myscatter.scatter_id in self.scats:
+                        i = self.scats.index(myscatter.scatter_id)                    
+                        self.scats.remove(myscatter.scatter_id)
+                        self.lines_array.pop(i)
+                    self.scats.append(myscatter.scatter_id)
+                    i = self.scats.index(myscatter.scatter_id)
+                    self.set_list(i,mypos, self.lines_array)
+                    
+                    if self.line_flag:
+                        points = [mypos1, mypos]
+                    else:
+                        points = [self.lines_array[-2], self.lines_array[-1]]
+                    myline = MyLine(self.myscatter_aux.scatter_id, myscatter.scatter_id, self.button_output_aux, instance, points, myscatter)
+                    self.lines_list.append(myline) #equivalente a self.set_list(i, myline, self.lines_list)
+                    self.ids.bloques_box.canvas.add(myline.line)
+                    #equivalente a Function: Add Edge
 
-                #if button_id == "inputs":
-                if self.myscatter_aux.scatter_id not in self.scatter_graph:
-                    self.scatter_graph[self.myscatter_aux.scatter_id] = set()
-                self.scatter_graph[self.myscatter_aux.scatter_id].add(myscatter.scatter_id)
-                    #print(self.scatter_graph)
-                    #self.set_list(self.myscatter_aux.scatter_id,[myscatter.scatter_id],self.scatter_graph) #ver. supone que solo un scatter va a estar conectado. no agrega relacion inversa
+                    #if button_id == "inputs":
+                    if self.myscatter_aux.scatter_id not in self.scatter_graph:
+                        self.scatter_graph[self.myscatter_aux.scatter_id] = set()
+                    self.scatter_graph[self.myscatter_aux.scatter_id].add(myscatter.scatter_id)
+                        #print(self.scatter_graph)
+                        #self.set_list(self.myscatter_aux.scatter_id,[myscatter.scatter_id],self.scatter_graph) #ver. supone que solo un scatter va a estar conectado. no agrega relacion inversa
 
-                self.myscatter_aux = 0   
+                    self.myscatter_aux = 0   
 
     def set_list(self, i, v, l):
       try:
@@ -304,7 +310,6 @@ class MainFloatLayout(FloatLayout):
                     print("Path no encontrado")
         
         self.run_pipes()
-
 
     def run_pipes(self): 
         for group in self.list_toposort:
@@ -395,6 +400,24 @@ class MainFloatLayout(FloatLayout):
         self.lines_array.clear()
         self.scatter_graph.clear()  
     
+    def popup_delete_line(self, line):
+        show = Popup_Delete_Line(self, line)
+        self.delete_line_popup = Popup(title="Delete Line", content=show,size_hint=(None,None),size=(400,150))
+        self.delete_line_popup.open()
+
+    def delete_line(self, line):
+        self.lines_list.remove(line)
+        line.clear_lines()
+        self.delete_line_popup.dismiss()
+
+        for key in self.scatter_graph:
+            if line.scatter_output == key:                
+                if line.scatter_input in self.scatter_graph[key]:
+                    self.scatter_graph[key].discard(line.scatter_input)
+                    break
+        if self.scatter_graph[key] == set():
+            del self.scatter_graph[key]             
+
     def Extract_Pipe_Code(self):
         i=0
         dir = str(Path(__file__).parent.absolute())
@@ -712,6 +735,12 @@ class Popup_Extraer_Codigo(FloatLayout):
         self.mainfloat = floatlayout
     pass
 
+class Popup_Delete_Line(FloatLayout):
+    def __init__(self, floatlayout, line, **kwargs):
+        super(Popup_Delete_Line, self).__init__(**kwargs)
+        self.mainfloat = floatlayout
+        self.line = line
+    pass
 
 class CodeBlock():
     #Para la creacion de codigo. Por ahora no la use
@@ -750,7 +779,6 @@ class MyLine:
     
     def clear_lines(self):
         self.line.clear()
-
 
 class FilterDD(Factory.DropDown):
     ignore_case = Factory.BooleanProperty(True)
