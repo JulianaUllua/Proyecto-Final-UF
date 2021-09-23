@@ -1,0 +1,81 @@
+{
+    "scatter_graph": {
+        "0": [
+            "1"
+        ]
+    },
+    "start_blocks": [
+        "0"
+    ],
+    "scats": [
+        "0",
+        "1"
+    ],
+    "scatter_list": [
+        {
+            "scatter": {
+                "nombre": "Load Image",
+                "funcion": "cv2.imread",
+                "group": "Input/Output",
+                "inputs": [
+                    "C:\\Users\\trini\\Pictures\\lena.png"
+                ],
+                "parameters": {},
+                "scatter_id": "0",
+                "pos": [
+                    180.0,
+                    300.0
+                ],
+                "in_images": 0,
+                "out_images": 1
+            }
+        },
+        {
+            "scatter": {
+                "nombre": "Apply ColorMap",
+                "funcion": "cv2.applyColorMap",
+                "group": "Conversions",
+                "parameters": {
+                    "ColorMap": 0
+                },
+                "scatter_id": "1",
+                "pos": [
+                    345.0,
+                    300.0
+                ],
+                "in_images": 1,
+                "out_images": 1
+            }
+        }
+    ],
+    "lines_list": [
+        {
+            "line": {
+                "scatter_output": "0",
+                "scatter_input": "1",
+                "points": [
+                    [
+                        330.0,
+                        371.25
+                    ],
+                    [
+                        345.0,
+                        371.25
+                    ]
+                ],
+                "scat_inp": {
+                    "funcion": {
+                        "nombre": "Apply ColorMap",
+                        "funcion": "cv2.applyColorMap",
+                        "group": "Conversions"
+                    },
+                    "parameters": {
+                        "ColorMap": 0
+                    },
+                    "in_images": 1,
+                    "out_images": 1
+                }
+            }
+        }
+    ]
+}
