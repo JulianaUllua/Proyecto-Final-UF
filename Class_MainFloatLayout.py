@@ -515,8 +515,8 @@ class MainFloatLayout(FloatLayout):
 
     def show_from_file_popup(self):
         dropdown = DropDown(size_hint_y = 1, size_hint_x =1) 
-        dir = str(Path(__file__).parent.absolute())
-        with os.scandir(dir + '\\saved_pipelines') as json_files:
+        dir = str(Path(__file__).parent.absolute().joinpath('saved_pipelines')) 
+        with os.scandir(dir) as json_files:
             for element in json_files:
                 button = Button(text = str(element.name), size_hint_y = None, height = 40)
                 buttoncallbackin = partial(self.from_file, str(element.name))
