@@ -427,12 +427,14 @@ class MainFloatLayout(FloatLayout):
         if s != "save":  
             self.extraer_popup = Popup(title="Extraer Codigo", content=show,size_hint=(None,None),size=(400,150))
         else:
-            box = BoxLayout(orientation = "horizontal")
+            box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
             button = Save_workspace_button(self)
             box.add_widget(button)
-            self.extraer_popup = Popup(title="Save Pipeline As", content=box,size_hint=(None,None),size=(400,120))
+            self.extraer_popup = Popup(title="Save Pipeline As", content=box,size_hint=(None,None),size=(400,150))
         self.extraer_popup.open()
 
+    def dismiss_extraer_popup(self):
+        self.extraer_popup.dismiss()
 
     def image_viewer(self):
         iv = ImageViewer()
@@ -510,37 +512,7 @@ class MainFloatLayout(FloatLayout):
                                         pipeline.output_toinput(self.scatter_list[int(node)], line)
                                     elif group != list(self.list_toposort[-1]):
                                         pipeline.output_toinput(self.scatter_list[int(node)])
-    """
-    def save_pipeline(self):
-        
-        #importación de datos desde el json
 
-        #copia de datos guardados
-        self.scatter_graph = scatter_graph
-        self.start_blocks = start_blocks
-        self.scats = scats
-        self.scatter_list = scatter_list
-        self.lines_list = lines_list
-
-        #set de variables        
-        #lines_array = [] # se llenaría con update lines?    
-        self.scatter_count = len(scatter_list) # para asignar id a scatter                   
-
-        #creación de bloques
-        for scatter in scatter_list:
-            if self.location < Window.system_size[0]* 0.8:
-                self.location = self.location + 165
-            else:
-                self.location= Window.system_size[0]*0.10
-            self.ids.bloques_box.add_widget(scatter)
-
-        #creación de líneas
-        for line in lines_list:
-            line.update_line(line.points)
-
-        #creación de pipelines
-        self.find_pipes()
-    """
     def show_from_file_popup(self):
         box = BoxLayout(orientation = "vertical")
         dir = str(Path(__file__).parent.absolute())
