@@ -514,16 +514,19 @@ class MainFloatLayout(FloatLayout):
                                         pipeline.output_toinput(self.scatter_list[int(node)])
 
     def show_from_file_popup(self):
-        box = BoxLayout(orientation = "vertical")
+        dropdown = DropDown(size_hint_y = 1, size_hint_x =1) 
         dir = str(Path(__file__).parent.absolute())
         with os.scandir(dir + '\\saved_pipelines') as json_files:
             for element in json_files:
-                button = Button(text = str(element.name))
-                box.add_widget(button)
+                button = Button(text = str(element.name), size_hint_y = None, height = 40)
                 buttoncallbackin = partial(self.from_file, str(element.name))
                 button.bind(on_press = buttoncallbackin )
+                dropdown.add_widget(button)
 
-        self.from_file_popup = Popup(title="Open workspace", content=box,size_hint=(None,None), size = (500,500))
+        mainbutton = Button(text='Select workspace', size_hint=(500, 150))
+        mainbutton.bind(on_release=dropdown.open)
+        dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
+        self.from_file_popup = Popup(title="Open workspace", content=dropdown,size_hint=(None,None), size = (500,200))
         self.from_file_popup.open()
 
     def from_file(self, filename, *args):
