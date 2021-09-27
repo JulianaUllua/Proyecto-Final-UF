@@ -608,9 +608,7 @@ class MainFloatLayout(FloatLayout):
                 self.lines_list.append(myline) 
                 self.ids.bloques_box.canvas.add(myline.line)
         
-        self.find_pipes()
-
-                        
+        self.find_pipes()            
 
     def to_file(self, filename):
         self.extraer_popup.dismiss()

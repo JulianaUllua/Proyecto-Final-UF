@@ -59,7 +59,7 @@ class Bloque:
         self.outputs = {}
         self.popup_bloque = Parameters_Popup(save_parameters = self.save_parameters, 
                             cancel_parameters = self.cancel_parameters, restore_parameters = self.restore_parameters, 
-                            try_parameters = self.try_parameters, size = (400,400))
+                            try_parameters = self.try_parameters, duplicate = self.duplicate, size = (400,400))
         self.in_images = 0 
         self.out_images = 0 
         self.search_widgets()
@@ -414,7 +414,7 @@ class Bloque:
             scatter_duplicate.inputs = self.inputs.copy()
         else:
             scatter_duplicate.duplicate_parameters()
-        self.ids.context_menu.hide()
+        self.parameters_popup.dismiss()
 
     def duplicate_parameters(self):
         root = self.popup_bloque.ids.variable_box
@@ -422,7 +422,10 @@ class Bloque:
             if isinstance(child, MySlider):
                 child.value = self.parameters[child.slider_label]
             if isinstance(child, MySpinner):
-                child.ids.spinner.text = child.ids.spinner.values[self.parameters[child.spinner_label]]
+                for value in child.ids.spinner.values:
+                    if eval(value) == self.parameters[child.spinner_label]:
+                        child.ids.spinner.text = value
+                        break
             if isinstance(child, MyImageSpinner):
                 child.ids.spinner.text = child.ids.spinner.values[self.parameters[child.spinner_label]]
             if isinstance(child, MySize):
@@ -610,8 +613,8 @@ class MyScatterLayout(Bloque, ScatterLayout):
                     if self.outputs != {}:
                         self.view_popup_image(self.outputs.values())
             self.parameters_popup.open()  
-        elif touch.button == 'right':
-            self.ids.context_menu.show(touch.pos[0], touch.pos[1])
+        #elif touch.button == 'right':
+        #    self.ids.context_menu.show(touch.pos[0], touch.pos[1])
         else:       
             x, y = touch.x, touch.y
             self.prev_x = touch.x
@@ -861,6 +864,7 @@ class Parameters_Popup(FloatLayout):
     cancel_parameters = kprop.ObjectProperty(None)
     restore_parameters = kprop.ObjectProperty(None)
     try_parameters = kprop.ObjectProperty(None)
+    duplicate = kprop.ObjectProperty(None)
     pass
 
 class LoadDialog(GridLayout):
