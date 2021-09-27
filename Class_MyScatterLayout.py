@@ -345,6 +345,7 @@ class Bloque:
         #cv2.waitKey(0)
         #self.try_evaluate(self.parameters)
         self.parameters_popup.dismiss()
+        self.update_line(self)
         
     def cancel_parameters(self):
         root = self.popup_bloque.ids.variable_box                           
@@ -356,6 +357,7 @@ class Bloque:
 
         self.parameters_popup.dismiss()
         self.try_evaluate(self.parameters)
+        self.update_line(self)
     
     #Para volver a valores iniciales del JSON
     def restore_parameters(self):
