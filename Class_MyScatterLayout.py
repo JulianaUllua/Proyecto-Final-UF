@@ -223,7 +223,7 @@ class Bloque:
             button_output = MyParameterButton(button_id = 'output_parameter', parameter_text = checkbox.parameter_text, source = source,background_color = [0, 0, 0, 0])
             self.ids.outputs.size_hint = .2, (.2 + .05*(2))
             self.ids.outputs.add_widget(button_output)    
-            #button_output.bind(on_release = self.save_output)
+            button_output.bind(on_release = self.save_output)
             buttoncallbackin = partial(self.draw_line_pipe, self, "outputs")
             button_output.bind(on_press= buttoncallbackin)
             checkbox.was_active = True
@@ -828,6 +828,9 @@ class MyParameterButton(Button):
         self.source = source
         self.ids.param_imag.source = source
         #Window.bind(mouse_pos=self.on_mouse_pos)# binding[subscribe]Event handling method of mouse position change
+    
+    #def on_touch_down(self, touch):
+    #    if touch.is_double_tap:  
     
 class MyIconButton(Button):
     pass

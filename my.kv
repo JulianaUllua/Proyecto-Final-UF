@@ -558,6 +558,29 @@
                 size_hint: None, None
                 pos_hint: {"x":0.35, "top":1}
 
+<Popup_Delete_Line>:
+        BoxLayout:
+                orientation:"vertical"
+                #pos_hint: {"x":0.35, "top":1}
+                pos_hint: {"x": 0, "top": 1}
+                Label:
+                        text: "Desea eliminar esta union?"
+                        #size_hint: None, None
+                        size_hint: 1, .3
+                        valign: 'middle'
+                        halign: 'center'
+                BoxLayout:
+                        orientation:"horizontal"
+                        pos_hint: {'x':0}
+                        size_hint: 1, .3
+                        Button:
+                                text: "Si"
+                                size_hint: .5, 1
+                                on_press: root.mainfloat.delete_line(root.line)
+                        Button:
+                                text: "Cancelar"
+                                size_hint: .5, 1
+                                on_press: root.mainfloat.delete_line_popup.dismiss()
 <Save_workspace_button>:
         BoxLayout:
                 orientation: 'vertical'
