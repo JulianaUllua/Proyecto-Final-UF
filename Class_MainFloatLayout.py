@@ -499,7 +499,7 @@ class MainFloatLayout(FloatLayout):
         self.popup.open()
 
     def run_pipes_until(self, scatter_id):
-        if  self.list_toposort != []:
+        if  self.list_toposort != [] and scatter_id in self.list_toposort:
             for group in self.list_toposort:
                 if scatter_id in group:
                     index = self.list_toposort.index(group)

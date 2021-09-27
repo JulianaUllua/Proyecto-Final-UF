@@ -158,13 +158,12 @@
                         pos_hint: {'x': 0.5, 'y': 0.5}
                         
                         ContextMenuTextItem:
-                                text: "Edit inputs"
-                                on_release: root.add_inputs(root)
-
+                                text: "Duplicate"
+                                on_release: root.duplicate()
                                                     
-                        ContextMenuTextItem:
-                                text: "Edit outputs"
-                                on_release: root.add_outputs(root)
+                        #ContextMenuTextItem:
+                        #        text: "Edit outputs"
+                        #        on_release: root.add_outputs(root)
 
 
 <SavedFloatScreen>:
