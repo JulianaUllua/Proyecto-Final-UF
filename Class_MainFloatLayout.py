@@ -807,10 +807,11 @@ class FilterDD(Factory.DropDown):
     options = Factory.ListProperty()
     options_groups = Factory.ListProperty()
 
-    def __init__(self, **kwargs):
+    def __init__(self, dismiss_on_select, **kwargs):
         self._needle = None
         self._order = []
         self._widgets = {}
+        self.dismiss_on_select = dismiss_on_select
         super(FilterDD, self).__init__(**kwargs)
         groups = CFunction.orderby_groups()
                 
