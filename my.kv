@@ -593,18 +593,26 @@
                                 size_hint: .5, 1
                                 on_press: root.mainfloat.delete_line_popup.dismiss()
 <Save_workspace_button>:
-        TextInput:
-                id: filename_input
-                size_hint: .7,.9
-                multiline: False
-                text: "saved_file"
-                on_text_validate: root.mainfloat.to_file(filename_input.text)
-                            
-        Button:
-                text: "Save"
-                size_hint: .3,.9
-                on_press: root.mainfloat.to_file(filename_input.text)
-
+        BoxLayout:
+                orientation: 'vertical'
+                TextInput:
+                        id: filename_input
+                        multiline: False
+                        text: "saved_file"
+                        on_text_validate: root.mainfloat.to_file(filename_input.text)
+                                
+                        
+                BoxLayout:
+                        orientation: 'horizontal'
+                        Button:
+                                text: "Cancel"
+                                size_hint: .3,.9
+                                on_press: root.mainfloat.dismiss_extraer_popup()
+                        Button:
+                                text: "Save"
+                                size_hint: .3,.9
+                                on_press: root.mainfloat.to_file(filename_input.text)
+                        
 <ImageViewer>:
         do_default_tab: False
         tab_width: None
