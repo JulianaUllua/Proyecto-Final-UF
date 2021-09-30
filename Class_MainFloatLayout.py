@@ -304,9 +304,7 @@ class MainFloatLayout(FloatLayout):
             for finish in finish_blocks:
                 paths = self.find_all_paths(self.scatter_graph, start, finish)  
                 if paths != None:
-                    print(paths)
                     for p in paths:
-                        print("p:",p)
                         if p != None:
                             # se crea pipe a partir del path
                             self.create_pipe(p) #ver. se puede hacer un constructor de la clase Pipeline
