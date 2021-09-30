@@ -17,9 +17,9 @@
                                 #on_release: root.show_save()
                                 ContextMenu:
                         AppMenuTextItem:
-                                text: 'Extract Code' 
+                                text: 'Export Code' 
                                 on_press: root.show_extraer_popup()
-                                on_release: root.Extract_Pipe_Code()
+                                #on_release: root.Extract_Pipe_Code()
                                 ContextMenu:
                         AppMenuTextItem:
                                 text: 'Clear Screen'
@@ -612,6 +612,27 @@
                                 text: "Save"
                                 size_hint: .3,.9
                                 on_press: root.mainfloat.to_file(filename_input.text)
+
+<Export_Code_button>:
+        BoxLayout:
+                orientation: 'vertical'
+                TextInput:
+                        id: filename_in
+                        multiline: False
+                        text: "saved_code"
+                        on_text_validate: root.mainfloat.Export_Pipe_Code(filename_in.text)
+                                
+                        
+                BoxLayout:
+                        orientation: 'horizontal'
+                        Button:
+                                text: "Cancel"
+                                size_hint: .3,.9
+                                on_press: root.mainfloat.dismiss_extraer_popup()
+                        Button:
+                                text: "Save"
+                                size_hint: .3,.9
+                                on_press: root.mainfloat.Export_Pipe_Code(filename_in.text)
                         
 <ImageViewer>:
         do_default_tab: False

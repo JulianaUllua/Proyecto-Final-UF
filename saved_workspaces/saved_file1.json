@@ -1,6 +1,9 @@
 {
     "scatter_graph": {
         "0": [
+            "1"
+        ],
+        "1": [
             "2"
         ]
     },
@@ -9,6 +12,7 @@
     ],
     "scats": [
         "0",
+        "1",
         "2"
     ],
     "scatter_list": [
@@ -24,13 +28,29 @@
                 "scatter_id": "0",
                 "pos": [
                     180.0,
-                    352.5
+                    300.0
                 ],
                 "in_images": 0,
                 "out_images": 1
             }
         },
-        null,
+        {
+            "scatter": {
+                "nombre": "Change Colorspace",
+                "funcion": "cv2.cvtColor",
+                "group": "Conversions",
+                "parameters": {
+                    "Color": 6
+                },
+                "scatter_id": "1",
+                "pos": [
+                    345.0,
+                    300.0
+                ],
+                "in_images": 1,
+                "out_images": 1
+            }
+        },
         {
             "scatter": {
                 "nombre": "Median Blur",
@@ -42,7 +62,7 @@
                 "scatter_id": "2",
                 "pos": [
                     510.0,
-                    352.5
+                    300.0
                 ],
                 "in_images": 1,
                 "out_images": 1
@@ -53,15 +73,43 @@
         {
             "line": {
                 "scatter_output": "0",
-                "scatter_input": "2",
+                "scatter_input": "1",
                 "points": [
                     [
                         330.0,
-                        423.75
+                        371.25
+                    ],
+                    [
+                        345.0,
+                        371.25
+                    ]
+                ],
+                "scat_inp": {
+                    "funcion": {
+                        "nombre": "Change Colorspace",
+                        "funcion": "cv2.cvtColor",
+                        "group": "Conversions"
+                    },
+                    "parameters": {
+                        "Color": 6
+                    },
+                    "in_images": 1,
+                    "out_images": 1
+                }
+            }
+        },
+        {
+            "line": {
+                "scatter_output": "1",
+                "scatter_input": "2",
+                "points": [
+                    [
+                        495.0,
+                        371.25
                     ],
                     [
                         510.0,
-                        423.75
+                        371.25
                     ]
                 ],
                 "scat_inp": {
