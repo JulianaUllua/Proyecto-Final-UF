@@ -59,7 +59,7 @@ class Bloque:
         self.outputs = {}
         self.popup_bloque = Parameters_Popup(save_parameters = self.save_parameters, 
                             cancel_parameters = self.cancel_parameters, restore_parameters = self.restore_parameters, 
-                            try_parameters = self.try_parameters, size = (400,400))
+                            try_parameters = self.try_parameters, duplicate = self.duplicate, size = (400,400))
         self.in_images = 0 
         self.out_images = 0 
         self.search_widgets()
@@ -151,7 +151,6 @@ class Bloque:
 
         except NameError: 
             print("NameError: Hay un o mas bloque/s sin input/s. Verifique las uniones")
-
 
     def view_popup_image(self, outputs):
         #Muestro imagen en Popup
@@ -268,7 +267,6 @@ class Bloque:
                             checkbox = MyCheckBox(item, False)
                             checkbox.bind(active=self.add_input_buttons)
                             self.popup_bloque.ids.opcional_checkbox_input.add_widget(checkbox)
-
                         
                         for item in key['outputs_order']:
                             self.outputs[item] = 'no output'
@@ -316,8 +314,7 @@ class Bloque:
                                     self.popup_bloque.ids.variable_box.add_widget(new_text_input)
                             if 'assign' in wid:
                                 for item in wid['assign']:
-                                    self.parameters[item['label']] = eval(item['text'])
-                            
+                                    self.parameters[item['label']] = eval(item['text'])                        
 
     # para class Parameters_Popup
     def save_parameters(self):
@@ -348,6 +345,7 @@ class Bloque:
         #cv2.waitKey(0)
         #self.try_evaluate(self.parameters)
         self.parameters_popup.dismiss()
+        self.update_line(self)
         
     def cancel_parameters(self):
         root = self.popup_bloque.ids.variable_box                           
@@ -359,6 +357,7 @@ class Bloque:
 
         self.parameters_popup.dismiss()
         self.try_evaluate(self.parameters)
+        self.update_line(self)
     
     #Para volver a valores iniciales del JSON
     def restore_parameters(self):
@@ -409,8 +408,35 @@ class Bloque:
 
             # actually put the texture in the kivy Image widget
             self.popup_bloque.add_widget(Image(color = (1,1,1,1), texture = texture))
-        
-        
+
+    def duplicate(self):
+        scatter_duplicate = self.parent.parent.parent.new_bloque(self.funcion.nombre)
+        scatter_duplicate.parameters = self.parameters.copy()
+        if self.funcion.nombre == "Load Image":
+            scatter_duplicate.inputs = self.inputs.copy()
+        else:
+            scatter_duplicate.duplicate_parameters()
+        self.parameters_popup.dismiss()
+
+    def duplicate_parameters(self):
+        root = self.popup_bloque.ids.variable_box
+        for child in root.children:
+            if isinstance(child, MySlider):
+                child.value = self.parameters[child.slider_label]
+            if isinstance(child, MySpinner):
+                for value in child.ids.spinner.values:
+                    if eval(value) == self.parameters[child.spinner_label]:
+                        child.ids.spinner.text = value
+                        break
+            if isinstance(child, MyImageSpinner):
+                child.ids.spinner.text = child.ids.spinner.values[self.parameters[child.spinner_label]]
+            if isinstance(child, MySize):
+                child.ids.text_input_1.text = str(self.parameters[child.text_label][0])
+                child.ids.text_input_2.text = str(self.parameters[child.text_label][1])
+            if isinstance(child, MyTextInput):
+                child.value = str(self.parameters[child.text_label]) #chequear
+            if isinstance(child, MyToggleButton):
+                child.down = self.parameters[child.label] #chequear
 
     # para class LoadDialog
     def load_dialog(self):
@@ -455,7 +481,6 @@ class MyScatterLayout(Bloque, ScatterLayout):
     scale_lock_right = False
     scale_lock_top = False
     scale_lock_bottom = False
-
 
     def join_buttons(self):
         dir = str(Path(__file__).parent.absolute())
@@ -587,10 +612,11 @@ class MyScatterLayout(Bloque, ScatterLayout):
         if touch.is_double_tap:
             if self.inputs != []:
                 if self.funcion.nombre != "Load Image":
-                    self.view_popup_image(self.outputs.values())
+                    if self.outputs != {}:
+                        self.view_popup_image(self.outputs.values())
             self.parameters_popup.open()  
         #elif touch.button == 'right':
-            #self.ids.context_menu.show(touch.pos[0], touch.pos[1])
+        #    self.ids.context_menu.show(touch.pos[0], touch.pos[1])
         else:       
             x, y = touch.x, touch.y
             self.prev_x = touch.x
@@ -840,6 +866,7 @@ class Parameters_Popup(FloatLayout):
     cancel_parameters = kprop.ObjectProperty(None)
     restore_parameters = kprop.ObjectProperty(None)
     try_parameters = kprop.ObjectProperty(None)
+    duplicate = kprop.ObjectProperty(None)
     pass
 
 class LoadDialog(GridLayout):

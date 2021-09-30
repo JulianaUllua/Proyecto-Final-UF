@@ -556,7 +556,7 @@ class MainFloatLayout(FloatLayout):
         self.popup.open()
 
     def run_pipes_until(self, scatter_id):
-        if  self.list_toposort != []:
+        if  self.list_toposort != [] and scatter_id in self.list_toposort:
             for group in self.list_toposort:
                 if scatter_id in group:
                     index = self.list_toposort.index(group)
@@ -638,9 +638,7 @@ class MainFloatLayout(FloatLayout):
                 self.lines_list.append(myline) 
                 self.ids.bloques_box.canvas.add(myline.line)
         
-        self.find_pipes()
-
-                        
+        self.find_pipes()            
 
     def to_file(self, filename):
         self.extraer_popup.dismiss()
@@ -839,10 +837,11 @@ class FilterDD(Factory.DropDown):
     options = Factory.ListProperty()
     options_groups = Factory.ListProperty()
 
-    def __init__(self, **kwargs):
+    def __init__(self, dismiss_on_select, **kwargs):
         self._needle = None
         self._order = []
         self._widgets = {}
+        self.dismiss_on_select = dismiss_on_select
         super(FilterDD, self).__init__(**kwargs)
         groups = CFunction.orderby_groups()
                 
