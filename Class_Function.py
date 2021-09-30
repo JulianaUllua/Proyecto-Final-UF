@@ -18,7 +18,7 @@ class Function:
             print(cv2.error)
         return outputs
 
-def BuscarFuncion(nombre):
+def search_function(nombre):
     for element in funciones:
         if element.nombre == nombre:
             return element

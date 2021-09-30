@@ -157,7 +157,7 @@ class MainFloatLayout(FloatLayout):
         super(MainFloatLayout, self).__init__(**kwargs)
         
     def new_bloque(self, value, scat_id = 0):
-        Fun = CFunction.BuscarFuncion(value)
+        Fun = CFunction.search_function(value)
         if scat_id == 0:
             scat_id = str(self.scatter_count)
 
@@ -199,7 +199,7 @@ class MainFloatLayout(FloatLayout):
                         break
 
                 if not self.line_flag:
-                    if myscatter.scatter_id in self.scats: #ver. se lo remueve de las listas para ponerlo en una nueva posicion, pero en caso de ser una segunda unión no habria que eliminarlo
+                    if myscatter.scatter_id in self.scats:
                         i = self.scats.index(myscatter.scatter_id) 
                         self.scats.remove(myscatter.scatter_id)
                         self.lines_array.pop(i)
@@ -401,7 +401,7 @@ class MainFloatLayout(FloatLayout):
             myline.clear_lines()
         self.lines_list.clear()
         self.lines_array.clear()
-        self.scatter_graph.clear()  
+        self.scatter_graph.clear()
     
     def popup_delete_line(self, line):
         show = Popup_Delete_Line(self, line)
