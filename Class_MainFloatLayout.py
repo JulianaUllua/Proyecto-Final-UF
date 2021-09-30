@@ -469,17 +469,14 @@ class MainFloatLayout(FloatLayout):
                             if self.scatter_list[int(node)].funcion.nombre == "Load Image":    
                                 p = pipeline.pipe[i].scatter_id                              
                                 secondfile.write("\nfilename_{} = r'{}'".format(p,self.scatter_list[int(node)].inputs[0]))
-                                secondfile.write("\nimg_{} = ".format(p) + self.scatter_list[int(node)].funcion.funcion  + "(filename_" + str(p) + ")")
-                                #p +=1
+                                secondfile.write("\nimg_{} = ".format(p) + self.scatter_list[int(node)].funcion.funcion  + "(filename_" + str(p) + ")\n")
+
                             else:
                                 p = pipeline.pipe[i-1].scatter_id
                                 parameters_aux = "img_{}".format(p)
                                 
                                 if self.scatter_list[int(node)].in_images > in_imag[int(node)]:
-                                    print(p_aux[int(node)])
                                     p_aux[int(node)] = p_aux[int(node)] + ", img_{}".format(p)
-                                    print(p_aux[int(node)])
-                                    #parameters_aux = p_aux[int(node)]
                                     in_imag[int(node)] += 1
                                     
                                 else:
@@ -491,11 +488,16 @@ class MainFloatLayout(FloatLayout):
                                         if value != 'no input':
                                             parameters_aux = parameters_aux + "," + str(value) 
       
-                                    secondfile.write("\nimg_{} = {}".format(pipeline.pipe[i].scatter_id , self.scatter_list[int(node)].funcion.funcion + "(" + parameters_aux +")"))
+                                    secondfile.write("\nimg_{} = {}".format(pipeline.pipe[i].scatter_id , self.scatter_list[int(node)].funcion.funcion + "(" + parameters_aux +")\n"))
                 s_c = s_c + 1
-                        
-                            #secondfile.write("\ncv2.imshow('Imagen Resultado', img_{})\ncv2.waitKey(0)".format(pipeline.pipe[i].scatter_id  ))  
-                            #secondfile.write("\n")
+            try:
+                finish_blocks = self.list_toposort[-1]
+                for f in finish_blocks:
+                    secondfile.write("\ncv2.imshow('Imagen Resultado', img_{})\ncv2.waitKey(0)".format(f))  
+                    secondfile.write("\n")
+            except IndexError: 
+                pass            
+
 
 
 
