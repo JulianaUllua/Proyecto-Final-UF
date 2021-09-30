@@ -47,3 +47,20 @@ def orderby_groups():
         else:
             groups[element.group] = [element]
     return groups
+
+color = {
+    "Input/Output" : (.166, .209, .180, 1),
+    "Geometry" : (.148, .211, .200, 1),
+    "Conversions" : (.143, .210, .221, 1),
+    "Local Operations" : (.154, .206, .235, 1),
+    "Point Operations" : (.178, .200, .240, 1),
+    "Arithmetic Operations" : (.205, .193, .233, 1),
+    "Numpy Functions" : (.228, .187, .218, 1)
+}
+#verde 166, 209, 180
+#148, 211, 200
+#143, 210, 221
+#154, 206, 235
+#178, 200, 240
+#205, 193, 233
+#228, 187, 218
