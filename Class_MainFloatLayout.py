@@ -156,13 +156,17 @@ class MainFloatLayout(FloatLayout):
     def __init__(self, **kwargs):
         super(MainFloatLayout, self).__init__(**kwargs)
         
-    def new_bloque(self, value, scat_id = 0):
+    def new_bloque(self, value, scat_id = "new"):
         Fun = CFunction.search_function(value)
-        if scat_id == 0:
-            scat_id = str(self.scatter_count)
+        #if scat_id == 0:
+         #   scat_id = str(self.scatter_count)
+        if scat_id != "new":
+            while (int(scat_id) != self.scatter_count):
+                self.scatter_list.append(None)
+                self.scatter_count +=1
 
         scatter = CScatter.MyScatterLayout(draw_line_pipe = self.draw_line_pipe, update_line = self.update_line, delete_scatter = self.delete_scatter, 
-                funcion = Fun, scatter_id = scat_id ,size=(150, 150) ,  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
+                funcion = Fun, scatter_id = str(self.scatter_count),size=(150, 150) ,  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
         if self.location < Window.system_size[0]* 0.8:
             self.location = self.location + 165
         else:
@@ -174,8 +178,8 @@ class MainFloatLayout(FloatLayout):
         if value == "Load Image":
             self.start_blocks.append(scatter.scatter_id) # para comenzar los paths desde estos
             
-            filename = r'C:\Users\trini\Pictures\lena.png'
-            #filename = r'C:\Users\Juliana\Pictures\cell.png'
+            #filename = r'C:\Users\trini\Pictures\lena.png'
+            filename = r'C:\Users\Juliana\Pictures\coins.jpg'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
         return scatter
@@ -193,7 +197,7 @@ class MainFloatLayout(FloatLayout):
                 self.button_output_aux = instance
                 mypos = [myscatter.pos[0] + pos[0] + instance.size[0], myscatter.pos[1] + pos[1] + instance.size[1]/2] #suma posicion del myscatter + posicion del button
                 self.line_flag = False
-                for line in self.lines_list:
+                for line in self.lines_list: #revisa las lineas existentes para que no permitir que se hagan dos sobre el mismo boton
                     if line.button_output == instance:
                         self.line_flag = True
                         break
@@ -237,6 +241,8 @@ class MainFloatLayout(FloatLayout):
                     i = self.scats.index(myscatter.scatter_id)
                     self.set_list(i,mypos, self.lines_array)
                     
+                    #points = [mypos1, mypos]
+
                     if self.line_flag:
                         points = [mypos1, mypos]
                     else:
@@ -446,8 +452,7 @@ class MainFloatLayout(FloatLayout):
                     
                 secondfile.write("\ncv2.imshow('Imagen Resultado', img_{})\ncv2.waitKey(0)".format(n))  
                 secondfile.write("\n")"""
-
-            
+          
             
     def Extract_Pipe_Code(self):    
         dir = str(Path(__file__).parent.absolute())
@@ -497,10 +502,6 @@ class MainFloatLayout(FloatLayout):
                     secondfile.write("\n")
             except IndexError: 
                 pass            
-
-
-
-
 
     def show_extraer_popup(self, s = ""):
         show = Popup_Extraer_Codigo(self)
@@ -618,13 +619,16 @@ class MainFloatLayout(FloatLayout):
             self.scatter_graph = {}
             for key, value in scatter_g.items():
                 self.scatter_graph[key] = set(value)
-            self.start_blocks = data['start_blocks']
+            #self.start_blocks = data['start_blocks']
             self.scats = data['scats']
             
             for item in data["scatter_list"]:
                 if item is not None:
                     scatter = self.new_bloque(item['scatter']['nombre'],item['scatter']['scatter_id'])
                     scatter.parameters = (item['scatter']['parameters'])
+                    #ver otra forma de arreglar excepcion
+                    if item['scatter']['nombre'] == "Gaussian Blur":
+                        scatter.parameters["ksize"] = (scatter.parameters["ksize"][0], scatter.parameters["ksize"][1])
                     scatter.pos = item['scatter']['pos']
                     for button in scatter.ids.inputs.children:
                         if isinstance(button, CScatter.MyParameterButton):
