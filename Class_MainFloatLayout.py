@@ -164,7 +164,7 @@ class MainFloatLayout(FloatLayout):
             while (int(scat_id) != self.scatter_count):
                 self.scatter_list.append(None)
                 self.scatter_count +=1
-
+        
         scatter = CScatter.MyScatterLayout(draw_line_pipe = self.draw_line_pipe, update_line = self.update_line, delete_scatter = self.delete_scatter, 
                 funcion = Fun, scatter_id = str(self.scatter_count),size=(150, 150) ,  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
         if self.location < Window.system_size[0]* 0.8:

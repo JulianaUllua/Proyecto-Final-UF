@@ -52,10 +52,10 @@ color = {
     "Input/Output" : (212/255, 56/255, 215/255, 1),
     "Geometry" : (1, 0, 139/255, 1),
     "Conversions" : (1, 3/255, 62/255, 1),
-    "Local Operations" : (.154, .206, .235, 1),
-    "Point Operations" : (.178, .200, .240, 1),
-    "Arithmetic Operations" : (.205, .193, .233, 1),
-    "Numpy Functions" : (.228, .187, .218, 1)
+    "Local Operations" : (1, 69/255, 0, 1),
+    "Point Operations" : (1, 131/255, 0, 1),
+    "Arithmetic Operations" : (236/255, 227/255, 0, 1),
+    "Numpy Functions" : (168/255, 244/255, 0, 1)
 }
 #verde 166/255, 209/255, 180/255, 1
 #148/255, 211/255, 200/255, 1
