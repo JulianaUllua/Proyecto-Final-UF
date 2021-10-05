@@ -587,8 +587,9 @@ class MainFloatLayout(FloatLayout):
         self.extraer_popup.dismiss()
         newpath = Path(__file__).parent.absolute().joinpath(filename)
         if not os.path.exists(newpath):
-            os.makedir(newpath)
+            os.mkdir(newpath)
         count = 0
+        
         try:
             finish_blocks = self.list_toposort[-1]
             for finish in finish_blocks:
