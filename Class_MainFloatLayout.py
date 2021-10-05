@@ -484,17 +484,23 @@ class MainFloatLayout(FloatLayout):
 
     def show_extraer_popup(self, s = ""):
         show = Popup_Extraer_Codigo(self)
-        if s != "save":  
+        if s == 'Save Image':
+            box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
+            button = Save_image_button(self)
+            box.add_widget(button)
+            self.extraer_popup = Popup(title="Save Image(s) As", content=box,size_hint=(None,None),size=(400,150))
+        if s == 'Export Code':  
             box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
             button = Export_Code_button(self)
             box.add_widget(button)
             self.extraer_popup = Popup(title="Export Code As .py file", content=box,size_hint=(None,None),size=(400,150))
-        else:
+        if s == 'Save Workspace':
             box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
             button = Save_workspace_button(self)
             box.add_widget(button)
             self.extraer_popup = Popup(title="Save Pipeline As", content=box,size_hint=(None,None),size=(400,150))
         self.extraer_popup.open()
+
 
     def dismiss_extraer_popup(self):
         self.extraer_popup.dismiss()
@@ -575,6 +581,37 @@ class MainFloatLayout(FloatLayout):
                                         pipeline.output_toinput(self.scatter_list[int(node)], line)
                                     elif group != list(self.list_toposort[-1]):
                                         pipeline.output_toinput(self.scatter_list[int(node)])
+
+
+    def save_output_images(self,filename):
+        self.extraer_popup.dismiss()
+        newpath = Path(__file__).parent.absolute().joinpath(filename)
+        if not os.path.exists(newpath):
+            os.makedir(newpath)
+        count = 0
+        try:
+            finish_blocks = self.list_toposort[-1]
+            for finish in finish_blocks:
+                scatter_outputs = self.scatter_list[int(finish)].outputs.values()
+                print(scatter_outputs)
+                if isinstance(scatter_outputs, np.ndarray):
+                    image = scatter_outputs
+                    img_name = filename + "_" + str(count) + ".bmp"
+                    file = os.path.join(newpath , img_name) 
+                    cv2.imwrite(file, image)
+                    count += 1
+                else:
+                    for image in scatter_outputs:
+                        if isinstance(image, np.ndarray):
+                            img_name = filename + "_" + str(count) + ".bmp"
+                            file = os.path.join(newpath , img_name) 
+                            cv2.imwrite(file, image)
+
+                            count += 1
+
+        except IndexError: #en caso de que haya un solo bloque, no funciona usar [-1], y da index error. No hay que crear ningun path, asique simplemente es un pass
+            pass
+
 
     def show_from_file_popup(self):
         dropdown = DropDown(size_hint_y = 1, size_hint_x =1) 
@@ -755,6 +792,9 @@ class MyHistogram(FigureCanvasKivyAgg):
             plt.xlim([0,256])
             
 class ImageViewer(TabbedPanel):
+    pass
+
+class Extension_Dropdown(BoxLayout):
     pass
 
 class MyWidget(BoxLayout):
@@ -945,6 +985,12 @@ class MyLabel(Label):
     def __init__(self, **kwargs):
         super(MyLabel, self).__init__(**kwargs)
         pass
+
+class Save_image_button(BoxLayout):
+    def __init__(self, floatlayout, **kwargs):
+        super(Save_image_button, self).__init__(**kwargs)
+        self.mainfloat = floatlayout
+    pass
 
 class Save_workspace_button(BoxLayout):
     def __init__(self, floatlayout, **kwargs):
