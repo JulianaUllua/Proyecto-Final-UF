@@ -13,13 +13,12 @@
                         cancel_handler_widget: mainfloat
 
                         AppMenuTextItem:
-                                text: 'Save Image' #todavia no funciona
-                                #on_release: root.show_save()
+                                text: 'Save Image' 
+                                on_release: root.show_extraer_popup('Save Image')
                                 ContextMenu:
                         AppMenuTextItem:
                                 text: 'Export Code' 
-                                on_press: root.show_extraer_popup()
-                                #on_release: root.Extract_Pipe_Code()
+                                on_press: root.show_extraer_popup('Export Code')
                                 ContextMenu:
                         AppMenuTextItem:
                                 text: 'Clear Screen'
@@ -35,8 +34,7 @@
                                 ContextMenu: 
                         AppMenuTextItem:
                                 text: 'Save Workspace'
-                                on_press: root.show_extraer_popup("save")
-                                #on_release: root.to_file("saved_file")
+                                on_press: root.show_extraer_popup('Save Workspace')
                                 ContextMenu:  
                 AppMenu:
                         id: tool_bar
@@ -613,6 +611,62 @@
                                 size_hint: .3,.9
                                 on_press: root.mainfloat.to_file(filename_input.text)
 
+<Save_image_button>:
+        BoxLayout:
+                orientation: 'vertical'
+                BoxLayout:
+                        orientation: 'horizontal'
+                        TextInput:
+                                id: filename_inp
+                                multiline: False
+                                text: "saved_images"
+                                #on_text_validate: root.mainfloat.save_output_images(filename_inp.text)
+
+                        Button:
+                                text: "File Format:"
+                                id: dd_btn
+                                on_release: dropdown_ex.open(self)
+                                on_parent: dropdown_ex.dismiss()
+                        DropDown:
+                                id: dropdown_ex
+                                size_hint_y: None
+                                height: '45dp'
+                                on_select: dd_btn.text = '{}'.format(args[1])
+                                
+                                Button:
+                                        text: ".png"
+                                        size_hint_y: None
+                                        height: '48dp'
+                                        on_release: dropdown_ex.select(".png")
+                                Button:
+                                        text: ".jpg"
+                                        size_hint_y: None
+                                        height: '48dp'
+                                        on_release: dropdown_ex.select(".jpg")
+                                Button:
+                                        text: ".tif"
+                                        size_hint_y: None
+                                        height: '48dp'
+                                        on_release: dropdown_ex.select(".tif")
+                                Button:
+                                        text: ".bmp"
+                                        size_hint_y: None
+                                        height: '48dp'
+                                        on_release: dropdown_ex.select(".bmp")    
+
+                                   
+                BoxLayout:
+                        orientation: 'horizontal'
+                        Button:
+                                text: "Cancel"
+                                size_hint: .3,.9
+                                on_press: root.mainfloat.dismiss_extraer_popup()
+                        Button:
+                                text: "Save"
+                                size_hint: .3,.9
+                                on_press: root.mainfloat.save_output_images(filename_inp.text, dd_btn.text)
+
+
 <Export_Code_button>:
         BoxLayout:
                 orientation: 'vertical'
@@ -633,7 +687,38 @@
                                 text: "Save"
                                 size_hint: .3,.9
                                 on_press: root.mainfloat.Export_Pipe_Code(filename_in.text)
-                        
+<Extension_Dropdown>:
+        Button:
+                text: "File Format:"
+                id: dd_btn
+                on_release: dropdown_ex.open(self)
+                on_parent: dropdown_ex.dismiss()
+        DropDown:
+                id: dropdown_ex
+                size_hint_y: None
+                height: '45dp'
+                on_select: dd_btn.text = '{}'.format(args[1])
+                
+                Button:
+                        text: ".png"
+                        size_hint_y: None
+                        height: '48dp'
+                        on_release: dropdown_ex.select(".png")
+                Button:
+                        text: ".jpg"
+                        size_hint_y: None
+                        height: '48dp'
+                        on_release: dropdown_ex.select(".jpg")
+                Button:
+                        text: ".tif"
+                        size_hint_y: None
+                        height: '48dp'
+                        on_release: dropdown_ex.select(".tif")
+                Button:
+                        text: ".bmp"
+                        size_hint_y: None
+                        height: '48dp'
+                        on_release: dropdown_ex.select(".bmp")                        
 <ImageViewer>:
         do_default_tab: False
         tab_width: None
