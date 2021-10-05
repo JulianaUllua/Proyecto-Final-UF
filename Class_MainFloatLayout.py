@@ -583,7 +583,7 @@ class MainFloatLayout(FloatLayout):
                                         pipeline.output_toinput(self.scatter_list[int(node)])
 
 
-    def save_output_images(self,filename):
+    def save_output_images(self,filename, file_extension):
         self.extraer_popup.dismiss()
         newpath = Path(__file__).parent.absolute().joinpath(filename)
         if not os.path.exists(newpath):
@@ -593,20 +593,18 @@ class MainFloatLayout(FloatLayout):
             finish_blocks = self.list_toposort[-1]
             for finish in finish_blocks:
                 scatter_outputs = self.scatter_list[int(finish)].outputs.values()
-                print(scatter_outputs)
                 if isinstance(scatter_outputs, np.ndarray):
                     image = scatter_outputs
-                    img_name = filename + "_" + str(count) + ".bmp"
+                    img_name = filename + "_" + str(count) + str(file_extension)
                     file = os.path.join(newpath , img_name) 
                     cv2.imwrite(file, image)
                     count += 1
                 else:
                     for image in scatter_outputs:
                         if isinstance(image, np.ndarray):
-                            img_name = filename + "_" + str(count) + ".bmp"
+                            img_name = filename + "_" + str(count) + str(file_extension)
                             file = os.path.join(newpath , img_name) 
                             cv2.imwrite(file, image)
-
                             count += 1
 
         except IndexError: #en caso de que haya un solo bloque, no funciona usar [-1], y da index error. No hay que crear ningun path, asique simplemente es un pass

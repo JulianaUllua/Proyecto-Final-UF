@@ -620,9 +620,39 @@
                                 id: filename_inp
                                 multiline: False
                                 text: "saved_images"
-                                on_text_validate: root.mainfloat.save_output_images(filename_inp.text)
+                                #on_text_validate: root.mainfloat.save_output_images(filename_inp.text)
 
-                        Extension_Dropdown:
+                        Button:
+                                text: "File Format:"
+                                id: dd_btn
+                                on_release: dropdown_ex.open(self)
+                                on_parent: dropdown_ex.dismiss()
+                        DropDown:
+                                id: dropdown_ex
+                                size_hint_y: None
+                                height: '45dp'
+                                on_select: dd_btn.text = '{}'.format(args[1])
+                                
+                                Button:
+                                        text: ".png"
+                                        size_hint_y: None
+                                        height: '48dp'
+                                        on_release: dropdown_ex.select(".png")
+                                Button:
+                                        text: ".jpg"
+                                        size_hint_y: None
+                                        height: '48dp'
+                                        on_release: dropdown_ex.select(".jpg")
+                                Button:
+                                        text: ".tif"
+                                        size_hint_y: None
+                                        height: '48dp'
+                                        on_release: dropdown_ex.select(".tif")
+                                Button:
+                                        text: ".bmp"
+                                        size_hint_y: None
+                                        height: '48dp'
+                                        on_release: dropdown_ex.select(".bmp")    
 
                                    
                 BoxLayout:
@@ -634,7 +664,7 @@
                         Button:
                                 text: "Save"
                                 size_hint: .3,.9
-                                on_press: root.mainfloat.save_output_images(filename_inp.text)
+                                on_press: root.mainfloat.save_output_images(filename_inp.text, dd_btn.text)
 
 
 <Export_Code_button>:
@@ -659,7 +689,7 @@
                                 on_press: root.mainfloat.Export_Pipe_Code(filename_in.text)
 <Extension_Dropdown>:
         Button:
-                text: "File Format"
+                text: "File Format:"
                 id: dd_btn
                 on_release: dropdown_ex.open(self)
                 on_parent: dropdown_ex.dismiss()
