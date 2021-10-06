@@ -795,6 +795,7 @@ class Extension_Dropdown(BoxLayout):
     pass
 
 class StencilBox(StencilView, BoxLayout):
+    #permite generar movimientos del scatter (scroll, mov libres) sin afectar las funciones de touch del resto de los widgets de la pestana
     def on_touch_down(self, touch):
         if not self.collide_point(*touch.pos):
             return

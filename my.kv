@@ -755,15 +755,15 @@
                                 pos: self.pos
 
                                 MyScatterPlane:
-                                        #pos_hint: {'center_x': 1, 'center_y': 1}
+                                        pos_hint: {'center_x':-1,'center_y':-0.5}
                                         do_rotation: False
                                         Image:
                                                 id: view_image_z
                                                 source: ""
                                                 color: 0,1,0,1  
-                                                size_: 500,500
                                                 size_hint: (None,None)
-                                                size: box_zoom_im.size
+                                                #size: box_zoom_im.size 
+                                                size: 500,500
                                                 
                         Label:
                                 size_hint: .2,.2
