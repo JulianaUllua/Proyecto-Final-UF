@@ -2,7 +2,6 @@
 import kivy
 import os
 from pathlib import Path
-from kivy.core import window
 from kivy.uix.behaviors.button import ButtonBehavior
 from kivy_garden.contextmenu.context_menu import ContextMenuDivider
 import numpy as np
@@ -20,6 +19,7 @@ from PIL import Image
 
 import itertools
 import kivy.garden 
+from kivy_garden.graph import Graph, MeshLinePlot
 from kivy.garden.matplotlib import FigureCanvasKivyAgg
 from kivy.app import App
 from kivy.config import Config
@@ -47,9 +47,10 @@ from kivy.uix.label import Label
 from kivy.uix.bubble import Bubble
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader, TabbedPanelItem
 
 from kivy.core.window import Window
+from kivy.core.image import Image
 from kivy.properties import ObjectProperty
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Ellipse, Line, Rectangle, Bezier 
@@ -509,7 +510,7 @@ class MainFloatLayout(FloatLayout):
         iv = ImageViewer()
         for scat in self.scatter_list:
             if scat != None:
-                th = TabbedPanelHeader(text='%d: %s' % (self.scatter_list.index(scat)+1, scat.funcion.nombre))
+                th = TabbedPanelHeader( text='%d: %s' % (self.scatter_list.index(scat)+1, scat.funcion.nombre))
                 th.width = th.texture_size[0]
                 th.padding = 30,0
                 th.font_size = '12sp'
@@ -533,11 +534,7 @@ class MainFloatLayout(FloatLayout):
 
                     th.content = mywidget
 
-                    if scat.colorfmt == 'bgr':
-                        scat.myhist = MyHistogram(image)
-                        mywidget.ids.histogram.add_widget(scat.myhist)
-                    #plt.show()  
-                    
+
                 except TypeError:
                     pass
 
@@ -545,6 +542,7 @@ class MainFloatLayout(FloatLayout):
 
         self.popup = Popup(title='Image Viewer', content=iv, size_hint=(.9, .9), size=Window.size)
         self.popup.open()
+
 
     def run_pipes_until(self, scatter_id):
         if  self.list_toposort != [] and scatter_id in self.list_toposort:
@@ -584,12 +582,13 @@ class MainFloatLayout(FloatLayout):
 
 
     def save_output_images(self,filename, file_extension):
+         
         self.extraer_popup.dismiss()
         newpath = Path(__file__).parent.absolute().joinpath(filename)
         if not os.path.exists(newpath):
             os.mkdir(newpath)
         count = 0
-        
+
         try:
             finish_blocks = self.list_toposort[-1]
             for finish in finish_blocks:
@@ -802,6 +801,19 @@ class MyWidget(BoxLayout):
     def __init__(self, text, **kwargs):
         super(MyWidget,self).__init__(**kwargs)
         self.text = text
+
+    def view_histogram(self, image):
+        height, width = image.height, image.width
+        newvalue = np.frombuffer(image.pixels, np.uint8)
+        image = newvalue.reshape(height, width, 4)
+        
+        color = ('b','g','r')
+        for i,col in enumerate(color):
+            self.hist = cv2.calcHist([image],[i],None,[256],[0,256])
+            plt.plot(self.hist,color = col)
+            plt.xlim([0,256])
+        plt.show()  
+    
     pass
 
 class Popup_Extraer_Codigo(FloatLayout):
@@ -817,7 +829,7 @@ class Popup_Delete_Line(FloatLayout):
         self.line = line
     pass
 
-class CodeBlock():
+"""class CodeBlock():
     #Para la creacion de codigo. Por ahora no la use
     def __init__(self, head, block):
         self.head = head
@@ -830,7 +842,7 @@ class CodeBlock():
                 result += block.__str__(indent) 
             else:
                 result += indent + block + "\n" 
-        return result
+        return result"""
 
 class MyLine:
 

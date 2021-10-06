@@ -733,17 +733,20 @@
                         color: 0,1,0,1  
                         size_hint: .9,1
                 BoxLayout:
-                        orientation: 'horizontal'
+                        orientation: 'vertical'
                         
                         Label:
                                 pos_hint: {"top": 1}
                                 text: root.text
                                 markup: True
-                                size_hint: .2,.1
-                        BoxLayout:
+                                #size_hint: .2,.1
+                        Button:
                                 pos_hint: {"top": 1}
                                 id: histogram
-                                size_hint: .8,.4
+                                text: "View Histogram"
+                                size_hint: .5,.5
+                                on_release: root.view_histogram(view_image.texture)
+                                
 
 <MyCheckBox>:
         width: self.parent.width if self.parent else 0
