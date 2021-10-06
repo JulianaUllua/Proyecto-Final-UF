@@ -33,7 +33,7 @@ from kivy_garden.contextmenu import AbstractMenuItem
 
 #import widgets:
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.scatter import Scatter
+from kivy.uix.scatter import Scatter, ScatterPlane
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
@@ -55,6 +55,7 @@ from kivy.properties import ObjectProperty
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Ellipse, Line, Rectangle, Bezier 
 import kivy.graphics.instructions as kins
+from kivy.graphics.transformation import Matrix
 
 #import modulo clase
 import Class_Function as CFunction
@@ -526,11 +527,14 @@ class MainFloatLayout(FloatLayout):
                     texture.blit_buffer(image.tobytes(order=None), colorfmt= scat.colorfmt, bufferfmt='ubyte')
                     texture.flip_vertical()
 
-                    text = ("[b]Statistics[/b]" + '\nDimension: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
+                    text = ("[b]Statistics[/b]" + '\n\nDimension: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
                             '\nHeight: {}'.format(image.shape[0]) + '\nWidth: {}'.format(image.shape[1])) 
                     mywidget = MyWidget(text, scat)
                     mywidget.ids.view_image.color = (1,1,1,1)
                     mywidget.ids.view_image.texture = texture
+
+                    mywidget.ids.view_image_z.color = (1,1,1,1)
+                    mywidget.ids.view_image_z.texture = texture
 
                     th.content = mywidget
 
@@ -824,6 +828,19 @@ class MyWidget(BoxLayout):
         plt.show() 
     
     pass
+
+class MyScatterPlane(ScatterPlane):
+    def on_touch_up(self, touch):
+        if self.collide_point(*touch.pos):
+            if touch.is_mouse_scrolling:
+                if touch.button == 'scrolldown':
+                    mat = Matrix().scale(.9, .9, .9)
+                    self.apply_transform(mat, anchor=touch.pos)
+                elif touch.button == 'scrollup':
+                    mat = Matrix().scale(1.1, 1.1, 1.1)
+                    self.apply_transform(mat, anchor=touch.pos)
+        return super().on_touch_up(touch)
+
 
 class Popup_Extraer_Codigo(FloatLayout):
     def __init__(self, floatlayout, **kwargs):
