@@ -68,7 +68,7 @@ import Class_MyScatterLayout as CScatter
 
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
-class MyApp(App):
+class ProtoPypeApp(App):
     
     def build(self):
         sm = ScreenManager()
@@ -510,6 +510,7 @@ class MainFloatLayout(FloatLayout):
         self.extraer_popup.dismiss()
 
     def image_viewer(self):
+
         iv = ImageViewer()
         for scat in self.scatter_list:
             if scat != None:
@@ -529,9 +530,9 @@ class MainFloatLayout(FloatLayout):
                     texture.blit_buffer(image.tobytes(order=None), colorfmt= scat.colorfmt, bufferfmt='ubyte')
                     texture.flip_vertical()
 
-                    text = ("[b]Statistics[/b]" + '\n\nDimension: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
+                    text = ("[b]Statistics[/b]" + '\nDimensions: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
                             '\nHeight: {}'.format(image.shape[0]) + '\nWidth: {}'.format(image.shape[1])) 
-                    mywidget = MyWidget(text, scat)
+                    mywidget = MyWidget(text, scat, self)
                     mywidget.ids.view_image.color = (1,1,1,1)
                     mywidget.ids.view_image.texture = texture
 
@@ -541,8 +542,8 @@ class MainFloatLayout(FloatLayout):
                     th.content = mywidget
 
 
-                except TypeError:
-                    pass
+                except Exception as ex:
+                    print(ex)
 
                 iv.add_widget(th)
 
@@ -787,19 +788,18 @@ class MenuScreen(Screen):
     pass
             
 class ImageViewer(TabbedPanel):
-    def on_touch_up(self, touch):
-        return super(ImageViewer,self).on_touch_up(touch)
     pass
 
 class Extension_Dropdown(BoxLayout):
     pass
 
 class StencilBox(StencilView, BoxLayout):
+    #permite generar movimientos del scatter (scroll, mov libres) sin afectar las funciones de touch del resto de los widgets de la pestana
     def on_touch_down(self, touch):
         if not self.collide_point(*touch.pos):
             return
         return super().on_touch_down(touch)
-
+ 
     def on_touch_move(self, touch):
         if not self.collide_point(*touch.pos):
             return
@@ -812,12 +812,13 @@ class StencilBox(StencilView, BoxLayout):
 
 class MyWidget(BoxLayout):
     text = kprop.StringProperty() #default value shown
-
-    def __init__(self, text, scat, **kwargs):
+        
+    def __init__(self, text, scat, floatlayout, **kwargs):
         super(MyWidget,self).__init__(**kwargs)
         self.text = text
         self.colorfmt = scat.colorfmt
         self.scat = scat
+        self.mainfloat = floatlayout
 
         if isinstance(scat.outputs.values(), np.ndarray):
             self.image = scat.outputs.values()
@@ -1077,4 +1078,4 @@ class Export_Code_button(BoxLayout):
     pass
 
 if __name__ == '__main__':
-    MyApp().run()
+    ProtoPypeApp().run()
