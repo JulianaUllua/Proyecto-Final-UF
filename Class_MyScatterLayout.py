@@ -474,6 +474,8 @@ class MyScatterLayout(Bloque, ScatterLayout):
         self.update_line = update_line
         self.delete_scatter = delete_scatter
         self.join_buttons()
+        self.pos_min = 200, 200
+        self.pos_max = 400, 200
 
     isShownMenu = kprop.BooleanProperty(True)
     move_lock = False

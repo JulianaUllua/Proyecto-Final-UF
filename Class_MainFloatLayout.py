@@ -530,7 +530,7 @@ class MainFloatLayout(FloatLayout):
                     texture.blit_buffer(image.tobytes(order=None), colorfmt= scat.colorfmt, bufferfmt='ubyte')
                     texture.flip_vertical()
 
-                    text = ("[b]Statistics[/b]" + '\nDimension: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
+                    text = ("[b]Statistics[/b]" + '\nDimensions: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
                             '\nHeight: {}'.format(image.shape[0]) + '\nWidth: {}'.format(image.shape[1])) 
                     mywidget = MyWidget(text, scat, self)
                     mywidget.ids.view_image.color = (1,1,1,1)
@@ -788,8 +788,6 @@ class MenuScreen(Screen):
     pass
             
 class ImageViewer(TabbedPanel):
-    def on_touch_up(self, touch):
-        return super(ImageViewer,self).on_touch_up(touch)
     pass
 
 class Extension_Dropdown(BoxLayout):

@@ -56,7 +56,6 @@
 
 
 <MyScatterLayout>:
-        
         BoxLayout:
                 id: scatter_box
                 canvas.before:
@@ -772,25 +771,25 @@
                                 pos_hint: {"center_x": 0.5}
                                 id: histogram
                                 text: "View Histogram"
-                                size_hint: .5,.3
+                                size_hint: .4,.3
                                 on_release: root.view_histogram()
                                 background_color: (0,0,0,0)
                                 background_normal: ''
 
                                 canvas.before:
                                         Color:
-                                                rgba: (48/255,84/255,150/255,1)
+                                                rgb: (48/255,84/255,150/255,1)
                                         RoundedRectangle:
                                                 size: self.size
                                                 pos: self.pos
-                                                radius: [50]
+                                                radius: [30]
                         Label:
                                 size_hint: .2,.2
                         Button:
                                 pos_hint: {"center_x": 0.5}
                                 id: save_image_button
-                                text: "Download Image"
-                                size_hint: .5,.3
+                                text: "Save Image"
+                                size_hint: .4,.3
                                 on_release: root.mainfloat.show_extraer_popup('Save Image')
                                 background_color: (0,0,0,0)
                                 background_normal: ''
@@ -801,7 +800,7 @@
                                         RoundedRectangle:
                                                 size: self.size
                                                 pos: self.pos
-                                                radius: [50]
+                                                radius: [30]
                         Label:
                                 size_hint: .2,.2
                        
