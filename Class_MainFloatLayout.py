@@ -528,7 +528,7 @@ class MainFloatLayout(FloatLayout):
 
                     text = ("[b]Statistics[/b]" + '\nDimension: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
                             '\nHeight: {}'.format(image.shape[0]) + '\nWidth: {}'.format(image.shape[1])) 
-                    mywidget = MyWidget(text)
+                    mywidget = MyWidget(text, scat)
                     mywidget.ids.view_image.color = (1,1,1,1)
                     mywidget.ids.view_image.texture = texture
 
@@ -798,21 +798,39 @@ class Extension_Dropdown(BoxLayout):
 class MyWidget(BoxLayout):
     text = kprop.StringProperty() #default value shown
 
-    def __init__(self, text, **kwargs):
+    def __init__(self, text, scat, **kwargs):
         super(MyWidget,self).__init__(**kwargs)
         self.text = text
+        self.colorfmt = scat.colorfmt
+        self.scat = scat
 
-    def view_histogram(self, image):
-        height, width = image.height, image.width
-        newvalue = np.frombuffer(image.pixels, np.uint8)
-        image = newvalue.reshape(height, width, 4)
-        
-        color = ('b','g','r')
-        for i,col in enumerate(color):
-            self.hist = cv2.calcHist([image],[i],None,[256],[0,256])
-            plt.plot(self.hist,color = col)
+        if isinstance(scat.outputs.values(), np.ndarray):
+            self.image = scat.outputs.values()
+        else:
+            for element in scat.outputs.values():
+                if isinstance(element, np.ndarray):
+                    self.image = element
+
+    def view_histogram(self):
+
+        fig = plt.figure(num = self.scat.funcion.nombre + " Histogram")
+        if self.colorfmt == 'bgr':
+            color = ('b','g','r')
+            for i,col in enumerate(color):
+                self.hist = cv2.calcHist([self.image],[i],None,[256],[0,255])
+                plt.plot(self.hist,color = col)
+                plt.xlim([0,256])
+            plt.legend(['Blue Channel','Green Channel', 'Red Channel'])
+
+        elif self.colorfmt == 'luminance':
+            self.hist = cv2.calcHist([self.image],[0],None,[256],[0,255])
+            plt.plot(self.hist)
             plt.xlim([0,256])
-        plt.show()  
+        
+        plt.xlabel("Count")
+        plt.ylabel("Intensity Value")
+        
+        plt.show() 
     
     pass
 

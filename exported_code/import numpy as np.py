@@ -20,6 +20,8 @@ for i,col in enumerate(color):
     plt.plot(histr,color = col)
     plt.xlim([0,256])
 
-#plt.figure()
+plt.figure()
+hist = cv2.calcHist([img_1],[0],None,[256],[0,256])
+plt.plot(hist)
 #plt.imshow((img_0))
 plt.show()
