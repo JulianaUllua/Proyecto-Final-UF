@@ -2,7 +2,6 @@
 import kivy
 import os
 from pathlib import Path
-from kivy.core import window
 from kivy.uix.behaviors.button import ButtonBehavior
 from kivy_garden.contextmenu.context_menu import ContextMenuDivider
 import numpy as np
@@ -20,6 +19,7 @@ from PIL import Image
 
 import itertools
 import kivy.garden 
+from kivy_garden.graph import Graph, MeshLinePlot
 from kivy.garden.matplotlib import FigureCanvasKivyAgg
 from kivy.app import App
 from kivy.config import Config
@@ -27,13 +27,14 @@ import kivy.properties as kprop
 
 from kivy.lang import Builder
 from kivy.factory import Factory
+from kivy.base import runTouchApp
 
 import kivy_garden.contextmenu
 from kivy_garden.contextmenu import AbstractMenuItem
 
 #import widgets:
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.scatter import Scatter
+from kivy.uix.scatter import Scatter, ScatterPlane
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
@@ -42,18 +43,21 @@ from kivy.uix.slider import Slider
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
+from kivy.uix.stencilview import StencilView
 
 from kivy.uix.label import Label
 from kivy.uix.bubble import Bubble
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader, TabbedPanelItem
 
 from kivy.core.window import Window
+from kivy.core.image import Image
 from kivy.properties import ObjectProperty
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Ellipse, Line, Rectangle, Bezier 
 import kivy.graphics.instructions as kins
+from kivy.graphics.transformation import Matrix
 
 #import modulo clase
 import Class_Function as CFunction
@@ -509,7 +513,7 @@ class MainFloatLayout(FloatLayout):
         iv = ImageViewer()
         for scat in self.scatter_list:
             if scat != None:
-                th = TabbedPanelHeader(text='%d: %s' % (self.scatter_list.index(scat)+1, scat.funcion.nombre))
+                th = TabbedPanelHeader( text='%d: %s' % (self.scatter_list.index(scat)+1, scat.funcion.nombre))
                 th.width = th.texture_size[0]
                 th.padding = 30,0
                 th.font_size = '12sp'
@@ -525,19 +529,18 @@ class MainFloatLayout(FloatLayout):
                     texture.blit_buffer(image.tobytes(order=None), colorfmt= scat.colorfmt, bufferfmt='ubyte')
                     texture.flip_vertical()
 
-                    text = ("[b]Statistics[/b]" + '\nDimension: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
+                    text = ("[b]Statistics[/b]" + '\n\nDimension: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
                             '\nHeight: {}'.format(image.shape[0]) + '\nWidth: {}'.format(image.shape[1])) 
-                    mywidget = MyWidget(text)
+                    mywidget = MyWidget(text, scat)
                     mywidget.ids.view_image.color = (1,1,1,1)
                     mywidget.ids.view_image.texture = texture
 
+                    mywidget.ids.view_image_z.color = (1,1,1,1)
+                    mywidget.ids.view_image_z.texture = texture
+
                     th.content = mywidget
 
-                    if scat.colorfmt == 'bgr':
-                        scat.myhist = MyHistogram(image)
-                        mywidget.ids.histogram.add_widget(scat.myhist)
-                    #plt.show()  
-                    
+
                 except TypeError:
                     pass
 
@@ -545,6 +548,7 @@ class MainFloatLayout(FloatLayout):
 
         self.popup = Popup(title='Image Viewer', content=iv, size_hint=(.9, .9), size=Window.size)
         self.popup.open()
+
 
     def run_pipes_until(self, scatter_id):
         if  self.list_toposort != [] and scatter_id in self.list_toposort:
@@ -584,12 +588,13 @@ class MainFloatLayout(FloatLayout):
 
 
     def save_output_images(self,filename, file_extension):
+         
         self.extraer_popup.dismiss()
         newpath = Path(__file__).parent.absolute().joinpath(filename)
         if not os.path.exists(newpath):
             os.mkdir(newpath)
         count = 0
-        
+
         try:
             finish_blocks = self.list_toposort[-1]
             for finish in finish_blocks:
@@ -780,29 +785,97 @@ class SavedFloatScreen(Screen):
 
 class MenuScreen(Screen):
     pass
-
-class MyHistogram(FigureCanvasKivyAgg):
-    def __init__(self, image, **kwargs):
-        super(MyHistogram,self).__init__(plt.gcf(), **kwargs)
-        color = ('b','g','r')
-        for i,col in enumerate(color):
-            self.histr = cv2.calcHist([image],[i],None,[256],[0,256])
-            plt.plot(self.histr,color = col)
-            plt.xlim([0,256])
             
 class ImageViewer(TabbedPanel):
+    def on_touch_up(self, touch):
+        return super(ImageViewer,self).on_touch_up(touch)
     pass
 
 class Extension_Dropdown(BoxLayout):
     pass
 
+class StencilBox(StencilView, BoxLayout):
+    def on_touch_down(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super().on_touch_down(touch)
+
+    def on_touch_move(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super().on_touch_move(touch)
+
+    def on_touch_up(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super().on_touch_up(touch)
+
 class MyWidget(BoxLayout):
     text = kprop.StringProperty() #default value shown
 
-    def __init__(self, text, **kwargs):
+    def __init__(self, text, scat, **kwargs):
         super(MyWidget,self).__init__(**kwargs)
         self.text = text
+        self.colorfmt = scat.colorfmt
+        self.scat = scat
+
+        if isinstance(scat.outputs.values(), np.ndarray):
+            self.image = scat.outputs.values()
+        else:
+            for element in scat.outputs.values():
+                if isinstance(element, np.ndarray):
+                    self.image = element
+
+    def view_histogram(self):
+
+        fig = plt.figure(num = self.scat.funcion.nombre + " Histogram")
+        if self.colorfmt == 'bgr':
+            color = ('b','g','r')
+            for i,col in enumerate(color):
+                self.hist = cv2.calcHist([self.image],[i],None,[256],[0,255])
+                plt.plot(self.hist,color = col)
+                plt.xlim([0,256])
+            plt.legend(['Blue Channel','Green Channel', 'Red Channel'])
+
+        elif self.colorfmt == 'luminance':
+            self.hist = cv2.calcHist([self.image],[0],None,[256],[0,255])
+            plt.plot(self.hist)
+            plt.xlim([0,256])
+        
+        plt.xlabel("Count")
+        plt.ylabel("Intensity Value")
+        
+        plt.show() 
+    
     pass
+
+class MyScatterPlane(ScatterPlane):
+    def on_touch_up(self, touch):
+        if self.collide_point(*touch.pos):
+            if touch.is_mouse_scrolling:
+                if touch.button == 'scrolldown':
+                    mat = Matrix().scale(.9, .9, .9)
+                    self.apply_transform(mat, anchor=touch.pos)
+                elif touch.button == 'scrollup':
+                    mat = Matrix().scale(1.1, 1.1, 1.1)
+                    self.apply_transform(mat, anchor=touch.pos)
+        return super(MyScatterPlane,self).on_touch_up(touch)
+
+class StencilBox(StencilView, BoxLayout):
+    def on_touch_down(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super(StencilBox, self).on_touch_down(touch)
+
+    def on_touch_move(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super(StencilBox, self).on_touch_move(touch)
+
+    def on_touch_up(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super(StencilBox, self).on_touch_up(touch)
 
 class Popup_Extraer_Codigo(FloatLayout):
     def __init__(self, floatlayout, **kwargs):
@@ -817,7 +890,7 @@ class Popup_Delete_Line(FloatLayout):
         self.line = line
     pass
 
-class CodeBlock():
+"""class CodeBlock():
     #Para la creacion de codigo. Por ahora no la use
     def __init__(self, head, block):
         self.head = head
@@ -830,7 +903,7 @@ class CodeBlock():
                 result += block.__str__(indent) 
             else:
                 result += indent + block + "\n" 
-        return result
+        return result"""
 
 class MyLine:
 
