@@ -779,15 +779,6 @@ class SavedFloatScreen(Screen):
 
 class MenuScreen(Screen):
     pass
-
-class MyHistogram(FigureCanvasKivyAgg):
-    def __init__(self, image, **kwargs):
-        super(MyHistogram,self).__init__(plt.gcf(), **kwargs)
-        color = ('b','g','r')
-        for i,col in enumerate(color):
-            self.histr = cv2.calcHist([image],[i],None,[256],[0,256])
-            plt.plot(self.histr,color = col)
-            plt.xlim([0,256])
             
 class ImageViewer(TabbedPanel):
     pass

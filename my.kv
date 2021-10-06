@@ -736,16 +736,29 @@
                         orientation: 'vertical'
                         
                         Label:
-                                pos_hint: {"top": 1}
+                                pos_hint: {"center_x": 0.5}
                                 text: root.text
                                 markup: True
                                 #size_hint: .2,.1
                         Button:
-                                pos_hint: {"top": 1}
+                                pos_hint: {"center_x": 0.5}
                                 id: histogram
                                 text: "View Histogram"
-                                size_hint: .5,.5
+                                size_hint: .5,.3
                                 on_release: root.view_histogram()
+                                background_color: (0,0,0,0)
+                                background_normal: ''
+
+                                canvas.before:
+                                        Color:
+                                                rgba: (48/255,84/255,150/255,1)
+                                        RoundedRectangle:
+                                                size: self.size
+                                                pos: self.pos
+                                                radius: [50]
+                        Label:
+
+        
                                 
 
 <MyCheckBox>:
