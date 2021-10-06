@@ -27,6 +27,7 @@ import kivy.properties as kprop
 
 from kivy.lang import Builder
 from kivy.factory import Factory
+from kivy.base import runTouchApp
 
 import kivy_garden.contextmenu
 from kivy_garden.contextmenu import AbstractMenuItem
@@ -42,6 +43,7 @@ from kivy.uix.slider import Slider
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
+from kivy.uix.stencilview import StencilView
 
 from kivy.uix.label import Label
 from kivy.uix.bubble import Bubble
@@ -785,10 +787,28 @@ class MenuScreen(Screen):
     pass
             
 class ImageViewer(TabbedPanel):
+    def on_touch_up(self, touch):
+        return super(ImageViewer,self).on_touch_up(touch)
     pass
 
 class Extension_Dropdown(BoxLayout):
     pass
+
+class StencilBox(StencilView, BoxLayout):
+    def on_touch_down(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super().on_touch_down(touch)
+
+    def on_touch_move(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super().on_touch_move(touch)
+
+    def on_touch_up(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super().on_touch_up(touch)
 
 class MyWidget(BoxLayout):
     text = kprop.StringProperty() #default value shown
@@ -839,8 +859,23 @@ class MyScatterPlane(ScatterPlane):
                 elif touch.button == 'scrollup':
                     mat = Matrix().scale(1.1, 1.1, 1.1)
                     self.apply_transform(mat, anchor=touch.pos)
-        return super().on_touch_up(touch)
+        return super(MyScatterPlane,self).on_touch_up(touch)
 
+class StencilBox(StencilView, BoxLayout):
+    def on_touch_down(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super(StencilBox, self).on_touch_down(touch)
+
+    def on_touch_move(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super(StencilBox, self).on_touch_move(touch)
+
+    def on_touch_up(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super(StencilBox, self).on_touch_up(touch)
 
 class Popup_Extraer_Codigo(FloatLayout):
     def __init__(self, floatlayout, **kwargs):

@@ -746,24 +746,13 @@
                                 text: "Zoom"
                                 bold: True
 
-                        BoxLayout:
+                        StencilBox:
                                 pos_hint: {"center_x": 0.5}
                                 size_hint: 0.7,0.7
                                 id: box_zoom_im
 
-                                canvas.before:
-                                        StencilPush
-                                        Rectangle:
-                                                pos: self.pos
-                                                size: self.size
-                                        StencilUse
-
-                                canvas.after:
-                                        StencilUnUse
-                                        Rectangle:
-                                                pos: self.pos
-                                                size: self.size
-                                        StencilPop
+                                size: self.size
+                                pos: self.pos
 
                                 MyScatterPlane:
                                         #pos_hint: {'center_x': 1, 'center_y': 1}
@@ -772,10 +761,13 @@
                                                 id: view_image_z
                                                 source: ""
                                                 color: 0,1,0,1  
+                                                size_: 500,500
                                                 size_hint: (None,None)
                                                 size: box_zoom_im.size
+                                                
                         Label:
-                                size_hint: .2,.1
+                                size_hint: .2,.2
+
                         Button:
                                 pos_hint: {"center_x": 0.5}
                                 id: histogram
@@ -792,6 +784,8 @@
                                                 size: self.size
                                                 pos: self.pos
                                                 radius: [50]
+                        Label:
+                                size_hint: .2,.2
                        
 
 <MyCheckBox>:
