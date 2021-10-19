@@ -19,8 +19,8 @@ from PIL import Image
 
 import itertools
 import kivy.garden 
-from kivy_garden.graph import Graph, MeshLinePlot
-from kivy.garden.matplotlib import FigureCanvasKivyAgg
+#from kivy_garden.graph import Graph, MeshLinePlot
+#from kivy.garden.matplotlib import FigureCanvasKivyAgg
 from kivy.app import App
 from kivy.config import Config
 import kivy.properties as kprop
@@ -1043,6 +1043,72 @@ class FilterDDTrigger(Factory.BoxLayout):
         self.remove_widget(self._textinput)
         self.add_widget(self._button)
         self._textinput.text = ''
+
+    def _on_select(self, instance, value):
+        self.parent.parent.parent.new_bloque(value)
+
+    def _on_enter(self, *largs):
+        container = self.dropdown.container
+        if container.children:
+            self.dropdown.select(container.children[-1].text)
+        else:
+            self.dropdown.dismiss()
+
+class FileDD(Factory.DropDown):
+    ignore_case = Factory.BooleanProperty(True)
+    options = Factory.ListProperty()
+
+    def __init__(self, **kwargs):
+        self._needle = None
+        self._order = []
+        self._widgets = {}
+        super(FileDD, self).__init__(**kwargs)
+        self.options.append('Save Image')
+        self.options.append('Save Workspace')
+    
+    def on_options(self, instance, values):
+        _order = self._order
+        _widgets = self._widgets
+        changed = False
+        for txt in values:
+            if txt not in _widgets:
+                _widgets[txt] = btn = Factory.DDButton(text=txt)
+                btn.bind()
+                _order.append(txt)
+                changed = True
+                if _widgets[txt] not in self.container.children:
+                    self.add_widget(_widgets[txt]) 
+        for txt in _order[:]:
+            if txt not in values:
+                #_order.remove(txt)
+                #del _widgets[txt]
+                changed = True
+
+class FileDDTrigger(Factory.BoxLayout):
+    def __init__(self, **kwargs):
+        super(FileDDTrigger, self).__init__(**kwargs)
+        self._prev_dd = None
+        self._button = btn = Factory.Button(text=self.text, background_normal = '', background_down = '', background_disabled_normal= "", background_disabled_down= "")
+        btn.background_color= (0.2, 0.71, 0.9, 1) if btn.state == 'down' else (0.2, 0.2, 0.2, 1.0)
+        btn.bind(on_release=self._on_release)
+        self.add_widget(btn)
+
+    text = Factory.StringProperty('File')
+    dropdown = Factory.ObjectProperty(None, allownone=True)
+    def on_dropdown(self, instance, value):
+        _prev_dd = self._prev_dd
+        if value is _prev_dd:
+            return
+        if _prev_dd:
+            _prev_dd.unbind(on_select=self._on_select)
+        if value:
+            value.bind(on_select=self._on_select)
+        self._prev_dd = value
+
+    def _on_release(self, *largs):
+        if not self.dropdown:
+            return
+        self.dropdown.open(self)
 
     def _on_select(self, instance, value):
         self.parent.parent.parent.new_bloque(value)

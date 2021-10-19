@@ -7,38 +7,48 @@
         BoxLayout:
                 orientation:"vertical"
                 size_hint: 1, 1
-                AppMenu:
-                        id: top_menu
-                        top: root.height
-                        cancel_handler_widget: mainfloat
-
-                        AppMenuTextItem:
-                                text: 'Save Image' 
-                                on_release: root.show_extraer_popup('Save Image')
-                                ContextMenu:
-                        AppMenuTextItem:
-                                text: 'Export Code' 
-                                on_press: root.show_extraer_popup('Export Code')
-                                ContextMenu:
-                        AppMenuTextItem:
-                                text: 'Clear Screen'
-                                on_release: root.clear_screen()
-                                ContextMenu:
-                        AppMenuTextItem:
-                                text: 'Image Viewer'
-                                on_release: root.image_viewer()
-                                ContextMenu:
-                        AppMenuTextItem:
-                                text: 'Run Pipe'
-                                on_release: root.find_pipes()  
-                                ContextMenu: 
-                        AppMenuTextItem:
-                                text: 'Save Workspace'
-                                on_press: root.show_extraer_popup('Save Workspace')
-                                ContextMenu:  
+                ActionBar:
+                        size: root.width, 50
+                        ActionView:
+                                id: ActionView
+                                ActionPrevious:
+                                        title: 'ProtoPype'   # app.title if app.title is not None else 'Action Previous'
+                                        with_previous: False                                
+                                        app_icon: "icons/pipe.png"
+                                        app_icon_width: 40
+                                        app_icon_height: 30
+                                ActionGroup:
+                                        id: App_ActionGroup
+                                        mode: 'spinner'
+                                        text: 'File'
+                                        dropdown_width: 200
+                                        use_separator: False
+                                        ActionButton:
+                                                text: 'Save Image' 
+                                                on_release: root.show_extraer_popup('Save Image')
+                                        ActionButton:
+                                                text: 'Save Workspace'
+                                                on_press: root.show_extraer_popup('Save Workspace')                    
+                                ActionGroup:   
+                                        use_separator: False  
+                                        ActionButton:
+                                                text: 'Export Code' 
+                                                on_press: root.show_extraer_popup('Export Code')
+                                        ActionButton:
+                                                text: 'Image Viewer'
+                                                on_release: root.image_viewer()                                   
+                                        ActionButton:
+                                                text: 'Clear Screen'
+                                                on_release: root.clear_screen()      
+                                        ActionButton:
+                                                text: 'Run Pipe'
+                                                icon: "icons/play.png"
+                                                on_release: root.find_pipes()
+                                        
+                
                 AppMenu:
                         id: tool_bar
-                        top: root.height - top_menu.size[1]
+                        top: root.height - ActionView.size[1]
                         cancel_handler_widget: mainfloat
 
                         FilterDDTrigger:
