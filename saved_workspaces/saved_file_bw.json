@@ -1,0 +1,183 @@
+{
+    "scatter_graph": {
+        "0": [
+            "1"
+        ],
+        "1": [
+            "2"
+        ],
+        "2": [
+            "3"
+        ]
+    },
+    "start_blocks": [
+        "0"
+    ],
+    "scats": [
+        "0",
+        "1",
+        "2",
+        "3"
+    ],
+    "scatter_list": [
+        {
+            "scatter": {
+                "nombre": "Load Image",
+                "funcion": "cv2.imread",
+                "group": "Input/Output",
+                "inputs": [
+                    "C:\\Users\\trini\\Pictures\\lena.png"
+                ],
+                "parameters": {},
+                "scatter_id": "0",
+                "pos": [
+                    60.0,
+                    230.0
+                ],
+                "in_images": 0,
+                "out_images": 1
+            }
+        },
+        {
+            "scatter": {
+                "nombre": "Change Colorspace",
+                "funcion": "cv2.cvtColor",
+                "group": "Conversions",
+                "parameters": {
+                    "Color": 6
+                },
+                "scatter_id": "1",
+                "pos": [
+                    330.0,
+                    320.0
+                ],
+                "in_images": 1,
+                "out_images": 1
+            }
+        },
+        {
+            "scatter": {
+                "nombre": "Median Blur",
+                "funcion": "cv2.medianBlur",
+                "group": "Local Operations",
+                "parameters": {
+                    "ksize": 13
+                },
+                "scatter_id": "2",
+                "pos": [
+                    560.0,
+                    390.0
+                ],
+                "in_images": 1,
+                "out_images": 1
+            }
+        },
+        {
+            "scatter": {
+                "nombre": "Canny",
+                "funcion": "cv2.Canny",
+                "group": "Local Operations",
+                "parameters": {
+                    "Min threshold": 100,
+                    "Max threshold": 200,
+                    "apertureSize": 3
+                },
+                "scatter_id": "3",
+                "pos": [
+                    780.0,
+                    270.0
+                ],
+                "in_images": 1,
+                "out_images": 1
+            }
+        }
+    ],
+    "lines_list": [
+        {
+            "line": {
+                "scatter_output": "0",
+                "scatter_input": "1",
+                "points": [
+                    [
+                        212.0,
+                        297.74999999999994
+                    ],
+                    [
+                        330.00000000000006,
+                        394.75
+                    ]
+                ],
+                "scat_inp": {
+                    "funcion": {
+                        "nombre": "Change Colorspace",
+                        "funcion": "cv2.cvtColor",
+                        "group": "Conversions"
+                    },
+                    "parameters": {
+                        "Color": 6
+                    },
+                    "in_images": 1,
+                    "out_images": 1
+                }
+            }
+        },
+        {
+            "line": {
+                "scatter_output": "1",
+                "scatter_input": "2",
+                "points": [
+                    [
+                        480.00000000000006,
+                        394.75
+                    ],
+                    [
+                        556.0,
+                        461.75000000000006
+                    ]
+                ],
+                "scat_inp": {
+                    "funcion": {
+                        "nombre": "Median Blur",
+                        "funcion": "cv2.medianBlur",
+                        "group": "Local Operations"
+                    },
+                    "parameters": {
+                        "ksize": 13
+                    },
+                    "in_images": 1,
+                    "out_images": 1
+                }
+            }
+        },
+        {
+            "line": {
+                "scatter_output": "2",
+                "scatter_input": "3",
+                "points": [
+                    [
+                        706.0,
+                        461.75000000000006
+                    ],
+                    [
+                        783.0,
+                        340.75000000000006
+                    ]
+                ],
+                "scat_inp": {
+                    "funcion": {
+                        "nombre": "Canny",
+                        "funcion": "cv2.Canny",
+                        "group": "Local Operations"
+                    },
+                    "parameters": {
+                        "Min threshold": 100,
+                        "Max threshold": 200,
+                        "apertureSize": 3
+                    },
+                    "in_images": 1,
+                    "out_images": 1
+                }
+            }
+        }
+    ]
+}

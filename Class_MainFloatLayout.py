@@ -2,7 +2,7 @@
 import kivy
 import os
 from pathlib import Path
-from kivy.core import window
+from kivy.uix.behaviors.button import ButtonBehavior
 from kivy_garden.contextmenu.context_menu import ContextMenuDivider
 import numpy as np
 import matplotlib
@@ -13,9 +13,13 @@ from numpy.lib.type_check import imag
 from toposort import toposort
 from concurrent import futures
 from concurrent.futures import ThreadPoolExecutor
+from collections import defaultdict
+from functools import partial
+from PIL import Image
 
-matplotlib.use("module://kivy.garden.matplotlib.backend_kivy")
+import itertools
 import kivy.garden 
+from kivy_garden.graph import Graph, MeshLinePlot
 from kivy.garden.matplotlib import FigureCanvasKivyAgg
 from kivy.app import App
 from kivy.config import Config
@@ -23,13 +27,14 @@ import kivy.properties as kprop
 
 from kivy.lang import Builder
 from kivy.factory import Factory
+from kivy.base import runTouchApp
 
 import kivy_garden.contextmenu
 from kivy_garden.contextmenu import AbstractMenuItem
 
 #import widgets:
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.scatter import Scatter
+from kivy.uix.scatter import Scatter, ScatterPlane
 from kivy.uix.scatterlayout import ScatterLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
@@ -38,18 +43,21 @@ from kivy.uix.slider import Slider
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
+from kivy.uix.stencilview import StencilView
 
 from kivy.uix.label import Label
 from kivy.uix.bubble import Bubble
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader, TabbedPanelItem
 
 from kivy.core.window import Window
+from kivy.core.image import Image
 from kivy.properties import ObjectProperty
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Ellipse, Line, Rectangle, Bezier 
 import kivy.graphics.instructions as kins
+from kivy.graphics.transformation import Matrix
 
 #import modulo clase
 import Class_Function as CFunction
@@ -60,14 +68,17 @@ import Class_MyScatterLayout as CScatter
 
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
-class MyApp(App):
+class ProtoPypeApp(App):
     
     def build(self):
         sm = ScreenManager()
         mf = MainFloatScreen(name= 'main screen')
         mf.add_widget(MainFloatLayout())
         sm.add_widget(mf)
+        sm.add_widget(SavedFloatScreen(name = "saved screen"))
+
         sm.add_widget(MenuScreen(name='menu screen'))
+        
         sm.current = 'menu screen'
 
         return sm
@@ -142,7 +153,7 @@ class MainFloatLayout(FloatLayout):
     scatter_count = 0 # para asignar id a scatter
     scatter_list = [] # guarda objetos scatter, vertices
     scatter_graph = {} # diccionario de grafo: {['key]:['value','value']}, key=scatter_id del output, value=scatter_id de los inputs con los que esté conectado
-    scatter_graph_string = [] # lista de grafo con type=string
+    #scatter_graph_string = [] # lista de grafo con type=string
     list_toposort = [] #lista de graph en orden de ejecucion 
     list_pipelines = [] #lista de pipelines creados
     start_blocks = [] # guarda objetos scatter del tipo Load Image, para comenzar los paths desde estos
@@ -151,10 +162,13 @@ class MainFloatLayout(FloatLayout):
     def __init__(self, **kwargs):
         super(MainFloatLayout, self).__init__(**kwargs)
         
-    def new_bloque(self, value):
+    def new_bloque(self, value, scat_id = 0):
         Fun = CFunction.BuscarFuncion(value)
+        if scat_id == 0:
+            scat_id = str(self.scatter_count)
+
         scatter = CScatter.MyScatterLayout(draw_line_pipe = self.draw_line_pipe, update_line = self.update_line, delete_scatter = self.delete_scatter, 
-                funcion = Fun, size=(150, 150), scatter_id = str(self.scatter_count),  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
+                funcion = Fun, scatter_id = scat_id ,size=(150, 150) ,  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
         if self.location < Window.system_size[0]* 0.8:
             self.location = self.location + 165
         else:
@@ -170,76 +184,82 @@ class MainFloatLayout(FloatLayout):
             #filename = r'C:\Users\Juliana\Pictures\cell.png'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
+        return scatter
 
     def draw_line_pipe(self, myscatter, button_id, instance):
-        pos = instance.pos # posicion del boton
-
-        if button_id == "outputs":
-            self.myscatter_aux = myscatter #guardo myscatter para después unirlo
-            self.button_output_aux = instance
-            mypos = [myscatter.pos[0] + pos[0] + instance.size[0], myscatter.pos[1] + pos[1] + instance.size[1]/2] #suma posicion del myscatter + posicion del button
-            self.line_flag = False
+        if instance.last_touch.button =='right':
             for line in self.lines_list:
-                if line.button_output == instance:
-                    self.line_flag = True
-                    break
+                if instance == line.button_output or instance == line.button_input:
+                    self.popup_delete_line(line)
+        else:
+            pos = instance.pos # posicion del boton
 
-            if not self.line_flag:
-                if myscatter.scatter_id in self.scats: #ver. se lo remueve de las listas para ponerlo en una nueva posicion, pero en caso de ser una segunda unión no habria que eliminarlo
-                    i = self.scats.index(myscatter.scatter_id) 
-                    self.scats.remove(myscatter.scatter_id)
-                    self.lines_array.pop(i)
-                self.scats.append(myscatter.scatter_id) #se lo agrega a las listas en nueva posicion
-                i = self.scats.index(myscatter.scatter_id)
-                self.set_list(i,mypos, self.lines_array) #equivalente a self.lines_array.append(mypos)
+            if button_id == "outputs":
+                self.myscatter_aux = myscatter #guardo myscatter para después unirlo
+                self.button_output_aux = instance
+                mypos = [myscatter.pos[0] + pos[0] + instance.size[0], myscatter.pos[1] + pos[1] + instance.size[1]/2] #suma posicion del myscatter + posicion del button
+                self.line_flag = False
+                for line in self.lines_list:
+                    if line.button_output == instance:
+                        self.line_flag = True
+                        break
 
-                if myscatter.scatter_id not in self.scatter_graph:
-                    #self.set_list(myscatter.scatter_id,{},self.scatter_graph) #equivalente a Function: Add Vertex
-                    self.scatter_graph[myscatter.scatter_id] = set()
+                if not self.line_flag:
+                    if myscatter.scatter_id in self.scats: #ver. se lo remueve de las listas para ponerlo en una nueva posicion, pero en caso de ser una segunda unión no habria que eliminarlo
+                        i = self.scats.index(myscatter.scatter_id) 
+                        self.scats.remove(myscatter.scatter_id)
+                        self.lines_array.pop(i)
+                    self.scats.append(myscatter.scatter_id) #se lo agrega a las listas en nueva posicion
+                    i = self.scats.index(myscatter.scatter_id)
+                    self.set_list(i,mypos, self.lines_array) #equivalente a self.lines_array.append(mypos)
 
-        elif button_id == "inputs" or "input_parameter":
-            if self.myscatter_aux != 0: #si hay un scatter para unir
-                if self.line_flag:
-                    for line in self.lines_list:
-                        if line.button_output == self.button_output_aux:
-                            for key, value in self.scatter_graph.items():
-                                if key == line.scatter_output:
-                                    value_to_pop = line.scatter_input
-                                    self.scatter_graph[line.scatter_output].remove(value_to_pop)
-                                    break
-                            self.lines_list.remove(line)
-                            mypos1 = line.points[0]
-                            line.clear_lines()
-                            del line
-                            break
+                    if myscatter.scatter_id not in self.scatter_graph:
+                        #self.set_list(myscatter.scatter_id,{},self.scatter_graph) #equivalente a Function: Add Vertex
+                        self.scatter_graph[myscatter.scatter_id] = set()
+
+            elif button_id == "inputs" or "input_parameter":
+                if self.myscatter_aux != 0: #si hay un scatter para unir
+                    if self.line_flag:
+                        for line in self.lines_list:
+                            if line.button_output == self.button_output_aux:
+                                for key, value in self.scatter_graph.items():
+                                    if key == line.scatter_output:
+                                        value_to_pop = line.scatter_input
+                                        self.scatter_graph[line.scatter_output].remove(value_to_pop)
+                                        break
+                                self.lines_list.remove(line)
+                                mypos1 = line.points[0]
+                                line.clear_lines()
+                                del line
+                                break
+                        
+                    mypos = [myscatter.pos[0] + pos[0], myscatter.pos[1] + pos[1] + instance.size[1]/2]
                     
-                mypos = [myscatter.pos[0] + pos[0], myscatter.pos[1] + pos[1] + instance.size[1]/2]
-                
-                if myscatter.scatter_id in self.scats:
-                    i = self.scats.index(myscatter.scatter_id)                    
-                    self.scats.remove(myscatter.scatter_id)
-                    self.lines_array.pop(i)
-                self.scats.append(myscatter.scatter_id)
-                i = self.scats.index(myscatter.scatter_id)
-                self.set_list(i,mypos, self.lines_array)
-                
-                if self.line_flag:
-                    points = [mypos1, mypos]
-                else:
-                    points = [self.lines_array[-2], self.lines_array[-1]]
-                myline = MyLine(self.myscatter_aux.scatter_id, myscatter.scatter_id, self.button_output_aux, instance, points, myscatter)
-                self.lines_list.append(myline) #equivalente a self.set_list(i, myline, self.lines_list)
-                self.ids.bloques_box.canvas.add(myline.line)
-                #equivalente a Function: Add Edge
+                    if myscatter.scatter_id in self.scats:
+                        i = self.scats.index(myscatter.scatter_id)                    
+                        self.scats.remove(myscatter.scatter_id)
+                        self.lines_array.pop(i)
+                    self.scats.append(myscatter.scatter_id)
+                    i = self.scats.index(myscatter.scatter_id)
+                    self.set_list(i,mypos, self.lines_array)
+                    
+                    if self.line_flag:
+                        points = [mypos1, mypos]
+                    else:
+                        points = [self.lines_array[-2], self.lines_array[-1]]
+                    myline = MyLine(self.myscatter_aux.scatter_id, myscatter.scatter_id, self.button_output_aux, instance, points, myscatter)
+                    self.lines_list.append(myline) #equivalente a self.set_list(i, myline, self.lines_list)
+                    self.ids.bloques_box.canvas.add(myline.line)
+                    #equivalente a Function: Add Edge
 
-                #if button_id == "inputs":
-                if self.myscatter_aux.scatter_id not in self.scatter_graph:
-                    self.scatter_graph[self.myscatter_aux.scatter_id] = set()
-                self.scatter_graph[self.myscatter_aux.scatter_id].add(myscatter.scatter_id)
-                    #print(self.scatter_graph)
-                    #self.set_list(self.myscatter_aux.scatter_id,[myscatter.scatter_id],self.scatter_graph) #ver. supone que solo un scatter va a estar conectado. no agrega relacion inversa
+                    #if button_id == "inputs":
+                    if self.myscatter_aux.scatter_id not in self.scatter_graph:
+                        self.scatter_graph[self.myscatter_aux.scatter_id] = set()
+                    self.scatter_graph[self.myscatter_aux.scatter_id].add(myscatter.scatter_id)
+                        #print(self.scatter_graph)
+                        #self.set_list(self.myscatter_aux.scatter_id,[myscatter.scatter_id],self.scatter_graph) #ver. supone que solo un scatter va a estar conectado. no agrega relacion inversa
 
-                self.myscatter_aux = 0   
+                    self.myscatter_aux = 0   
 
     def set_list(self, i, v, l):
       try:
@@ -269,10 +289,10 @@ class MainFloatLayout(FloatLayout):
             pipe.reset()
             del pipe
         
-        #try:
         self.list_pipelines = []
         # se ordena el graph en orden según dependencias
         self.list_toposort = list(toposort(self.scatter_graph))
+        
         self.list_toposort.reverse() # lista guarda en orden en que hay que ejecutar los bloques
         print("toposort:", str(self.list_toposort))
         
@@ -286,9 +306,11 @@ class MainFloatLayout(FloatLayout):
         # se buscan los path
         for start in start_blocks:
             for finish in finish_blocks:
-                paths = self.find_all_paths(self.scatter_graph, start, finish)
+                paths = self.find_all_paths(self.scatter_graph, start, finish)  
                 if paths != None:
+                    print(paths)
                     for p in paths:
+                        print("p:",p)
                         if p != None:
                             # se crea pipe a partir del path
                             self.create_pipe(p) #ver. se puede hacer un constructor de la clase Pipeline
@@ -297,21 +319,6 @@ class MainFloatLayout(FloatLayout):
                     print("Path no encontrado")
         
         self.run_pipes()
-
-        #except IndexError:
-        #    print("IndexError: Debe unir por lo menos dos bloques")
-    def from_file(self,filename):
-        
-        pass
-
-    def to_file(self,filename):
-        try:
-            with open("pepe.json") as f:
-                json.dump(self, f, indent=4, ensure_ascii=False)
-        except Exception as ex:
-            print(ex)
-
-
 
     def run_pipes(self): 
         for group in self.list_toposort:
@@ -355,6 +362,8 @@ class MainFloatLayout(FloatLayout):
                 newpaths = self.find_all_paths(graph, node, end, path)
                 for newpath in newpaths:
                     paths.append(newpath)
+        paths.sort()
+        paths=list(paths for paths,_ in itertools.groupby(paths))
         return paths
 
     def create_pipe(self, path): 
@@ -402,39 +411,110 @@ class MainFloatLayout(FloatLayout):
         self.lines_array.clear()
         self.scatter_graph.clear()  
     
-    def Extract_Pipe_Code(self):
-        i=0
+    def popup_delete_line(self, line):
+        show = Popup_Delete_Line(self, line)
+        self.delete_line_popup = Popup(title="Delete Line", content=show,size_hint=(None,None),size=(400,150))
+        self.delete_line_popup.open()
+
+    def delete_line(self, line):
+        self.lines_list.remove(line)
+        line.clear_lines()
+        self.delete_line_popup.dismiss()
+
+        for key in self.scatter_graph:
+            if line.scatter_output == key:                
+                if line.scatter_input in self.scatter_graph[key]:
+                    self.scatter_graph[key].discard(line.scatter_input)
+                    break
+        if self.scatter_graph[key] == set():
+            del self.scatter_graph[key]             
+
+            
+    def Export_Pipe_Code(self, filename):    
+        self.extraer_popup.dismiss()
         dir = str(Path(__file__).parent.absolute())
-        #with open(r'C:\Users\trini\OneDrive\Favaloro\Tesis\Código\06-Junio\05_06_21\autogenerated_code.py','w+') as secondfile: 
-        with open(dir + '\\autogenerated_code.py','w+') as secondfile:
+        with open(dir + '\\exported_code\\%s.py' %filename,'w+') as secondfile:
+            in_imag = [1] * self.scatter_count
+            p_aux = []
+            for x in range (0, self.scatter_count):
+                p_aux.append("img_{}".format(x-1))
+            s_c = 0
             importing = 'import numpy as np\nfrom cv2 import cv2\nfrom matplotlib import pyplot as plt\n\n'
             secondfile.write(str(importing))
-            for pipeline in self.list_pipelines:
-                n=0
-                if pipeline.pipe[0].funcion.nombre == "Load Image":
-                    secondfile.write("\nfilename_{} = r'{}'".format(i,pipeline.pipe[0].inputs[0]))
-                    secondfile.write("\nimg_{} = ".format(n) + pipeline.pipe[0].funcion.funcion  + "(filename_" + str(i) + ")")
-                    i+=1
-                for fun in pipeline.pipe[1:]:
-                    parameters_aux = "img_{}".format(n)
-                    for value in fun.parameters.values():
-                        parameters_aux = parameters_aux+ "," + str(value) 
-                    n += 1
-                    secondfile.write("\nimg_{} = {}".format(n,fun.funcion.funcion + "(" + parameters_aux +")"))
-                    
-                secondfile.write("\ncv2.imshow('Imagen Resultado', img_{})\ncv2.waitKey(0)".format(n))  
-                secondfile.write("\n")
+            for group in self.list_toposort:
+                group = list(group) # se guarda al set como list                            
+                for node in group:                    
+                    for pipeline in self.list_pipelines:
+                        if self.scatter_list[int(node)] in pipeline.pipe:
+                            i = pipeline.pipe.index(self.scatter_list[int(node)])
+                        
+                            if self.scatter_list[int(node)].funcion.nombre == "Load Image":    
+                                p = pipeline.pipe[i].scatter_id                              
+                                secondfile.write("\nfilename_{} = r'{}'".format(p,self.scatter_list[int(node)].inputs[0]))
+                                secondfile.write("\nimg_{} = ".format(p) + self.scatter_list[int(node)].funcion.funcion  + "(filename_" + str(p) + ")\n")
 
-    def show_extraer_popup(self):
+                            else:
+                                p = pipeline.pipe[i-1].scatter_id
+                                parameters_aux = "img_{}".format(p)
+                                
+                                if self.scatter_list[int(node)].in_images > in_imag[int(node)]:
+                                    p_aux[int(node)] = p_aux[int(node)] + ", img_{}".format(p)
+                                    in_imag[int(node)] += 1
+                                    
+                                else:
+                                    n = str(int(s_c) - 1)
+                                    idx = p_aux.index("img_" + n)
+                                    if p_aux[int(node)] != "img_{}".format(idx):
+                                        parameters_aux = p_aux[int(node)]
+                                    for value in self.scatter_list[int(node)].parameters.values():
+                                        if value != 'no input':
+                                            parameters_aux = parameters_aux + "," + str(value) 
+                                        """elif isinstance(value, np.ndarray):
+                                            np.save("test.txt", value)
+                                            secondfile.write('"img_aux_{} ='.format(p) + str(np.load("test.txt")) + "\n")
+                                            parameters_aux = parameters_aux + "," + "\nimg_aux_{}".format(p)"""
+      
+                                    secondfile.write("\nimg_{} = {}".format(pipeline.pipe[i].scatter_id , self.scatter_list[int(node)].funcion.funcion + "(" + parameters_aux +")\n"))
+                s_c = s_c + 1
+            try:
+                finish_blocks = self.list_toposort[-1]
+                for f in finish_blocks:
+                    secondfile.write("\ncv2.imshow('Imagen Resultado', img_{})\ncv2.waitKey(0)".format(f))  
+                    secondfile.write("\n")
+            except IndexError: 
+                pass            
+
+
+
+    def show_extraer_popup(self, s = ""):
         show = Popup_Extraer_Codigo(self)
-        self.extraer_popup = Popup(title="Extraer Codigo", content=show,size_hint=(None,None),size=(400,150))
+        if s == 'Save Image':
+            box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
+            button = Save_image_button(self)
+            box.add_widget(button)
+            self.extraer_popup = Popup(title="Save Image(s) As", content=box,size_hint=(None,None),size=(400,150))
+        if s == 'Export Code':  
+            box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
+            button = Export_Code_button(self)
+            box.add_widget(button)
+            self.extraer_popup = Popup(title="Export Code As .py file", content=box,size_hint=(None,None),size=(400,150))
+        if s == 'Save Workspace':
+            box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
+            button = Save_workspace_button(self)
+            box.add_widget(button)
+            self.extraer_popup = Popup(title="Save Pipeline As", content=box,size_hint=(None,None),size=(400,150))
         self.extraer_popup.open()
 
+
+    def dismiss_extraer_popup(self):
+        self.extraer_popup.dismiss()
+
     def image_viewer(self):
+
         iv = ImageViewer()
         for scat in self.scatter_list:
             if scat != None:
-                th = TabbedPanelHeader(text='%d: %s' % (self.scatter_list.index(scat)+1, scat.funcion.nombre))
+                th = TabbedPanelHeader( text='%d: %s' % (self.scatter_list.index(scat)+1, scat.funcion.nombre))
                 th.width = th.texture_size[0]
                 th.padding = 30,0
                 th.font_size = '12sp'
@@ -450,29 +530,29 @@ class MainFloatLayout(FloatLayout):
                     texture.blit_buffer(image.tobytes(order=None), colorfmt= scat.colorfmt, bufferfmt='ubyte')
                     texture.flip_vertical()
 
-                    text = ("[b]Statistics[/b]" + '\nDimension: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
+                    text = ("[b]Statistics[/b]" + '\nDimensions: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
                             '\nHeight: {}'.format(image.shape[0]) + '\nWidth: {}'.format(image.shape[1])) 
-                    mywidget = MyWidget(text)
+                    mywidget = MyWidget(text, scat, self)
                     mywidget.ids.view_image.color = (1,1,1,1)
                     mywidget.ids.view_image.texture = texture
 
+                    mywidget.ids.view_image_z.color = (1,1,1,1)
+                    mywidget.ids.view_image_z.texture = texture
+
                     th.content = mywidget
 
-                    if scat.colorfmt == 'bgr':
-                        myhist = MyHistogram(image)
-                        mywidget.ids.histogram.add_widget(myhist)
-                    #plt.show()  
-                    
-                except TypeError:
-                    pass
+
+                except Exception as ex:
+                    print(ex)
 
                 iv.add_widget(th)
 
         self.popup = Popup(title='Image Viewer', content=iv, size_hint=(.9, .9), size=Window.size)
         self.popup.open()
 
+
     def run_pipes_until(self, scatter_id):
-        if  self.list_toposort != []:
+        if  self.list_toposort != [] and scatter_id in self.list_toposort:
             for group in self.list_toposort:
                 if scatter_id in group:
                     index = self.list_toposort.index(group)
@@ -507,34 +587,296 @@ class MainFloatLayout(FloatLayout):
                                     elif group != list(self.list_toposort[-1]):
                                         pipeline.output_toinput(self.scatter_list[int(node)])
 
-    #def save_pipeline(self):
+
+    def save_output_images(self,filename, file_extension):
+         
+        self.extraer_popup.dismiss()
+        newpath = Path(__file__).parent.absolute().joinpath(filename)
+        if not os.path.exists(newpath):
+            os.mkdir(newpath)
+        count = 0
+
+        try:
+            finish_blocks = self.list_toposort[-1]
+            for finish in finish_blocks:
+                scatter_outputs = self.scatter_list[int(finish)].outputs.values()
+                if isinstance(scatter_outputs, np.ndarray):
+                    image = scatter_outputs
+                    img_name = filename + "_" + str(count) + str(file_extension)
+                    file = os.path.join(newpath , img_name) 
+                    cv2.imwrite(file, image)
+                    count += 1
+                else:
+                    for image in scatter_outputs:
+                        if isinstance(image, np.ndarray):
+                            img_name = filename + "_" + str(count) + str(file_extension)
+                            file = os.path.join(newpath , img_name) 
+                            cv2.imwrite(file, image)
+                            count += 1
+
+        except IndexError: #en caso de que haya un solo bloque, no funciona usar [-1], y da index error. No hay que crear ningun path, asique simplemente es un pass
+            pass
+
+
+    def show_from_file_popup(self):
+        dropdown = DropDown(size_hint_y = 1, size_hint_x =1) 
+        dir = str(Path(__file__).parent.absolute().joinpath('saved_workspaces')) 
+        with os.scandir(dir) as json_files:
+            for element in json_files:
+                button = Button(text = str(element.name), size_hint_y = None, height = 40)
+                buttoncallbackin = partial(self.from_file, str(element.name))
+                button.bind(on_press = buttoncallbackin )
+                dropdown.add_widget(button)
+
+        mainbutton = Button(text='Select workspace', size_hint=(500, 150))
+        mainbutton.bind(on_release=dropdown.open)
+        dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
+        self.from_file_popup = Popup(title="Open workspace", content=dropdown,size_hint=(None,None), size = (500,200))
+        self.from_file_popup.open()
+
+    def from_file(self, filename, *args):
+        self.from_file_popup.dismiss()
+        dir = str(Path(__file__).parent.absolute())
+        with open(dir + "\\saved_workspaces\\%s" %filename) as f:
+            data = json.load(f)
+            scatter_g = (data['scatter_graph'])
+            for key, value in scatter_g.items():
+                self.scatter_graph[key] = set(value)
+            self.start_blocks = data['start_blocks']
+            self.scats = data['scats']
+            
+            for item in data["scatter_list"]:
+                if item is not None:
+                    scatter = self.new_bloque(item['scatter']['nombre'],item['scatter']['scatter_id'])
+                    scatter.parameters = (item['scatter']['parameters'])
+                    scatter.pos = item['scatter']['pos']
+                    for button in scatter.ids.inputs.children:
+                        if isinstance(button, CScatter.MyParameterButton):
+                            input = button
+                        if isinstance(button, CScatter.MyIconButton):
+                            input = button
+                    for button in scatter.ids.outputs.children:
+                        if isinstance(button, CScatter.MyParameterButton):
+                            output = button
+
+            for item in data["lines_list"]:
+                myline = MyLine(item['line']['scatter_output'], item['line']['scatter_input'], output, input, item['line']['points'], scatter)
+                self.lines_list.append(myline) 
+                self.ids.bloques_box.canvas.add(myline.line)
+        
+        #self.find_pipes()            
+
+    def to_file(self, filename):
+        self.extraer_popup.dismiss()
+        try:
+            dir = str(Path(__file__).parent.absolute())
+            with open(dir + '\\saved_workspaces\\%s.json' % filename, 'w') as f:
+                    json_data = {
+                        'scatter_graph' : self.scatter_graph,
+                        'start_blocks' : self.start_blocks,
+                        'scats' : self.scats,
+                        'scatter_list' : self.scatter_list,
+                        'lines_list' : self.lines_list
+                    }
+                    encoder = MultipleJsonEncoders(SetEncoder, MyLineEncoder, MyScatterLayoutEncoder, NumpyArrayEncoder)
+                    json.dump(json_data, f, indent=4, ensure_ascii=False, cls=encoder)
+
+        except Exception as ex:
+            print(ex)
+
+class MultipleJsonEncoders():
+    #Combine multiple JSON encoders
+
+    def __init__(self, *encoders):
+        self.encoders = encoders
+        self.args = ()
+        self.kwargs = {}
+
+    def default(self, obj):
+        for encoder in self.encoders:
+            try:
+                return encoder(*self.args, **self.kwargs).default(obj)
+            except TypeError:
+                pass
+        raise TypeError(f'Object of type {obj.__class__.__name__} is not JSON serializable')
+
+    def __call__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+        enc = json.JSONEncoder(*args, **kwargs)
+        enc.default = self.default
+        return enc
+
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+       if isinstance(obj, set):
+           return list(obj)
+
+       return json.JSONEncoder.default(self, obj)
+
+class NumpyArrayEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+class MyScatterLayoutEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, CScatter.MyScatterLayout): # this is the item class you want to serialize
+            try:
+                scatter_dict = defaultdict(dict)
+                scatter_dict['nombre'] = obj.funcion.nombre
+                scatter_dict['funcion'] = obj.funcion.funcion
+                scatter_dict['group'] = obj.funcion.group
+
+                # por ahora decidi solo guardar el filename de los load image porq los arrays generados desp ocupan mucho espacio y podemos generarlos en output to input devuelta
+                if obj.funcion.nombre == "Load Image":
+                    scatter_dict['inputs'] = obj.inputs
+                scatter_dict['parameters'] = obj.parameters
+                scatter_dict['scatter_id'] = obj.scatter_id
+                scatter_dict['pos'] = obj.pos
+
+                scatter_dict['in_images'] = obj.in_images
+                scatter_dict['out_images'] = obj.out_images
+                
+                return {'scatter': scatter_dict} 
+            except TypeError:
+                pass
+        return json.JSONEncoder.default(self, obj)
+
+class MyLineEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, MyLine): # this is the item class you want to serialize
+            try:
+                property_dict = defaultdict(dict)
+                property_dict['scatter_output'] = obj.scatter_output
+                property_dict['scatter_input'] = obj.scatter_input
+
+                property_dict['points'] = obj.points
+
+                scatter_dict = defaultdict(dict)
+                scatter_dict['nombre'] = obj.scat_inp.funcion.nombre
+                scatter_dict['funcion'] = obj.scat_inp.funcion.funcion
+                scatter_dict['group'] = obj.scat_inp.funcion.group
+
+                property_dict['scat_inp']['funcion']= scatter_dict
+
+                
+                property_dict['scat_inp']['parameters'] = obj.scat_inp.parameters
+                property_dict['scat_inp']['in_images'] = obj.scat_inp.in_images
+                property_dict['scat_inp']['out_images'] = obj.scat_inp.out_images
+                
+                return {'line': property_dict} 
+            except TypeError:
+                pass
+        return json.JSONEncoder.default(self, obj)
 
 
 class MainFloatScreen(Screen):
     pass
 
-class MenuScreen(Screen):
+class SavedFloatScreen(Screen):
+    def fileload(self):
+        mf = MainFloatLayout()
+        self.add_widget(mf)
+        mf.show_from_file_popup()
     pass
 
-class MyHistogram(FigureCanvasKivyAgg):
-    def __init__(self, image, **kwargs):
-        super(MyHistogram,self).__init__(plt.gcf(), **kwargs)
-        color = ('b','g','r')
-        for i,col in enumerate(color):
-            self.histr = cv2.calcHist([image],[i],None,[256],[0,256])
-            plt.plot(self.histr,color = col)
-            plt.xlim([0,256])
+class MenuScreen(Screen):
+    pass
             
 class ImageViewer(TabbedPanel):
     pass
 
+class Extension_Dropdown(BoxLayout):
+    pass
+
+class StencilBox(StencilView, BoxLayout):
+    #permite generar movimientos del scatter (scroll, mov libres) sin afectar las funciones de touch del resto de los widgets de la pestana
+    def on_touch_down(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super().on_touch_down(touch)
+ 
+    def on_touch_move(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super().on_touch_move(touch)
+
+    def on_touch_up(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super().on_touch_up(touch)
+
 class MyWidget(BoxLayout):
     text = kprop.StringProperty() #default value shown
-
-    def __init__(self, text, **kwargs):
+        
+    def __init__(self, text, scat, floatlayout, **kwargs):
         super(MyWidget,self).__init__(**kwargs)
         self.text = text
+        self.colorfmt = scat.colorfmt
+        self.scat = scat
+        self.mainfloat = floatlayout
+
+        if isinstance(scat.outputs.values(), np.ndarray):
+            self.image = scat.outputs.values()
+        else:
+            for element in scat.outputs.values():
+                if isinstance(element, np.ndarray):
+                    self.image = element
+
+    def view_histogram(self):
+
+        fig = plt.figure(num = self.scat.funcion.nombre + " Histogram")
+        if self.colorfmt == 'bgr':
+            color = ('b','g','r')
+            for i,col in enumerate(color):
+                self.hist = cv2.calcHist([self.image],[i],None,[256],[0,255])
+                plt.plot(self.hist,color = col)
+                plt.xlim([0,256])
+            plt.legend(['Blue Channel','Green Channel', 'Red Channel'])
+
+        elif self.colorfmt == 'luminance':
+            self.hist = cv2.calcHist([self.image],[0],None,[256],[0,255])
+            plt.plot(self.hist)
+            plt.xlim([0,256])
+        
+        plt.xlabel("Count")
+        plt.ylabel("Intensity Value")
+        
+        plt.show() 
+    
     pass
+
+class MyScatterPlane(ScatterPlane):
+    def on_touch_up(self, touch):
+        if self.collide_point(*touch.pos):
+            if touch.is_mouse_scrolling:
+                if touch.button == 'scrolldown':
+                    mat = Matrix().scale(.9, .9, .9)
+                    self.apply_transform(mat, anchor=touch.pos)
+                elif touch.button == 'scrollup':
+                    mat = Matrix().scale(1.1, 1.1, 1.1)
+                    self.apply_transform(mat, anchor=touch.pos)
+        return super(MyScatterPlane,self).on_touch_up(touch)
+
+class StencilBox(StencilView, BoxLayout):
+    def on_touch_down(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super(StencilBox, self).on_touch_down(touch)
+
+    def on_touch_move(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super(StencilBox, self).on_touch_move(touch)
+
+    def on_touch_up(self, touch):
+        if not self.collide_point(*touch.pos):
+            return
+        return super(StencilBox, self).on_touch_up(touch)
 
 class Popup_Extraer_Codigo(FloatLayout):
     def __init__(self, floatlayout, **kwargs):
@@ -542,8 +884,14 @@ class Popup_Extraer_Codigo(FloatLayout):
         self.mainfloat = floatlayout
     pass
 
+class Popup_Delete_Line(FloatLayout):
+    def __init__(self, floatlayout, line, **kwargs):
+        super(Popup_Delete_Line, self).__init__(**kwargs)
+        self.mainfloat = floatlayout
+        self.line = line
+    pass
 
-class CodeBlock():
+"""class CodeBlock():
     #Para la creacion de codigo. Por ahora no la use
     def __init__(self, head, block):
         self.head = head
@@ -556,7 +904,7 @@ class CodeBlock():
                 result += block.__str__(indent) 
             else:
                 result += indent + block + "\n" 
-        return result
+        return result"""
 
 class MyLine:
 
@@ -579,18 +927,18 @@ class MyLine:
         self.line.add(Ellipse(pos=(points[1][0]-6, points[1][1]-5), size=(7,7)))
     
     def clear_lines(self):
-        self.line.clear()          
-
+        self.line.clear()
 
 class FilterDD(Factory.DropDown):
     ignore_case = Factory.BooleanProperty(True)
     options = Factory.ListProperty()
     options_groups = Factory.ListProperty()
 
-    def __init__(self, **kwargs):
+    def __init__(self, dismiss_on_select, **kwargs):
         self._needle = None
         self._order = []
         self._widgets = {}
+        self.dismiss_on_select = dismiss_on_select
         super(FilterDD, self).__init__(**kwargs)
         groups = CFunction.orderby_groups()
                 
@@ -711,5 +1059,23 @@ class MyLabel(Label):
         super(MyLabel, self).__init__(**kwargs)
         pass
 
+class Save_image_button(BoxLayout):
+    def __init__(self, floatlayout, **kwargs):
+        super(Save_image_button, self).__init__(**kwargs)
+        self.mainfloat = floatlayout
+    pass
+
+class Save_workspace_button(BoxLayout):
+    def __init__(self, floatlayout, **kwargs):
+        super(Save_workspace_button, self).__init__(**kwargs)
+        self.mainfloat = floatlayout
+    pass
+
+class Export_Code_button(BoxLayout):
+    def __init__(self, floatlayout, **kwargs):
+        super(Export_Code_button, self).__init__(**kwargs)
+        self.mainfloat = floatlayout
+    pass
+
 if __name__ == '__main__':
-    MyApp().run()
+    ProtoPypeApp().run()
