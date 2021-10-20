@@ -186,7 +186,7 @@ class Bloque:
                 source = dir + '\\icons\\retval.png'
             elif checkbox.parameter_text == 'Color' or checkbox.parameter_text =='ColorMap':
                 source = dir + '\\icons\\color.png'
-            elif checkbox.parameter_text == 'mask':
+            elif checkbox.parameter_text == 'mask' or checkbox.parameter_text == 'kernel':
                 source = dir + '\\icons\\mask.png'
             elif checkbox.parameter_text == 'dsize':
                 source = dir + '\\icons\\size.png'
