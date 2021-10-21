@@ -44,6 +44,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
 from kivy.uix.stencilview import StencilView
+from kivy.uix.actionbar import ActionItem
 
 from kivy.uix.label import Label
 from kivy.uix.bubble import Bubble
@@ -1124,6 +1125,12 @@ class MyLabel(Label):
     def __init__(self, **kwargs):
         super(MyLabel, self).__init__(**kwargs)
         pass
+
+class MyActionButton(BoxLayout, ActionItem):
+    icon = kprop.StringProperty()
+    text = kprop.StringProperty()
+    on_release = kprop.StringProperty()
+    pass
 
 class Save_image_button(BoxLayout):
     def __init__(self, floatlayout, **kwargs):
