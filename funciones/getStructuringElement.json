@@ -26,6 +26,10 @@
 
             }   ]
               
+        }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
         }]
     }
   ]

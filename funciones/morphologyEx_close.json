@@ -10,6 +10,10 @@
       "widgets": [{
           "assign": [{"text":"cv2.MORPH_CLOSE", "label": "op"},
                      {"text":"cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))", "label": "kernel"}  ]
-                }]
+                }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     }        
 ]

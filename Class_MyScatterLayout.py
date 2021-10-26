@@ -257,7 +257,8 @@ class Bloque:
                 
                 for key in data:
                     if key['nombre'] == self.funcion.nombre:
-                        
+
+                        # asignación de parametros a checkbox inputs                        
                         for item in key['parameters_order']:
                             if item == 'dst':
                                 self.parameters[item] = None
@@ -268,16 +269,18 @@ class Bloque:
                             checkbox.bind(active=self.add_input_buttons)
                             self.popup_bloque.ids.opcional_checkbox_input.add_widget(checkbox)
                         
+                        # asignación de outputs a checkbox outputs
                         for item in key['outputs_order']:
                             self.outputs[item] = 'no output'
                             checkbox = MyCheckBox(item, False)
                             checkbox.bind(active=self.add_output_buttons)
                             self.popup_bloque.ids.opcional_checkbox_output.add_widget(checkbox)
 
-                        #asignacion a variable del numero de inputs y outputs tipo imagen
+                        # asignacion a variable del numero de inputs y outputs tipo imagen
                         self.in_images = key['input images']
                         self.out_images = key['output images']
 
+                        # creación de widgets del popup
                         for wid in key['widgets']:
                             if 'slider' in wid:
                                 for item in wid['slider']:
@@ -314,7 +317,17 @@ class Bloque:
                                     self.popup_bloque.ids.variable_box.add_widget(new_text_input)
                             if 'assign' in wid:
                                 for item in wid['assign']:
-                                    self.parameters[item['label']] = eval(item['text'])                        
+                                    self.parameters[item['label']] = eval(item['text'])             
+
+                        # asignación de información al popup
+                        self.popup_bloque.ids.information_title.text = '[b]' + self.funcion.nombre + '[/b]'
+                        self.popup_bloque.ids.information_title.markup = True
+                        if key['information'] != []:
+                            for item in key['information']:
+                                self.popup_bloque.ids.information_content_fun.text = item['function'] + "\n"
+                                self.popup_bloque.ids.information_content_par.text ="\n" + item['parameters']
+                        else:
+                            self.popup_bloque.ids.information_content_fun.text = "No information"
 
     # para class Parameters_Popup
     def save_parameters(self):
