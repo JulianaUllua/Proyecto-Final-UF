@@ -1,6 +1,7 @@
 #:kivy 1.1.0
 #: import Button kivy.uix.button.Button
 #:import F kivy.factory.Factory
+#:import partial functools.partial
 
 <MainFloatLayout>:
         id: mainfloat
@@ -8,57 +9,50 @@
                 orientation:"vertical"
                 size_hint: 1, 1
                 ActionBar:
-                        size: root.width, 50
                         ActionView:
                                 id: ActionView
-                                use_separator: False
-                                ActionPrevious:
-                                        title: 'ProtoPype'   # app.title if app.title is not None else 'Action Previous'
-                                        with_previous: False                                
-                                        app_icon: "icons/pipe.png"
-                                        app_icon_width: 40
-                                        app_icon_height: 30
-                 
-                                ActionGroup:   
-                                        use_separator: False  
-                                        ActionGroup:
-                                                id: App_ActionGroup
-                                                mode: 'spinner'
-                                                text: 'File'
-                                                dropdown_width: 50
-                                                width: 50
-                                                ActionButton:
-                                                        text: 'Save Image' 
-                                                        on_release: root.show_extraer_popup('Save Image')
-                                                ActionButton:
-                                                        text: 'Save Workspace'
-                                                        on_press: root.show_extraer_popup('Save Workspace')
-                                                ActionButton:
-                                                        text: 'Open Workspace'
-                                                        on_press: root.parent.manager.current = 'saved screen'
-                                                ActionButton:
-                                                        text: 'New Workspace'
-                                                        on_press: root.parent.manager.current = 'main screen' 
+                                 
+                                HiddenIcon_ActionPrevious:
+
+                                #ActionGroup:    
+                                ActionGroup:
+                                        id: App_ActionGroup
+                                        mode: 'spinner'
+                                        text: 'File'
+                                        dropdown_width: 150
+                                        width: 150
                                         ActionButton:
-                                                text: 'Export Code' 
-                                                icon: "icons/export_code.png"
-                                                width: 50
-                                                on_press: root.show_extraer_popup('Export Code')
+                                                text: 'Save Image' 
+                                                on_release: root.show_extraer_popup('Save Image')
                                         ActionButton:
-                                                text: 'Image Viewer'
-                                                icon: "icons/image_viewer.png"
-                                                width: 50
-                                                on_release: root.image_viewer()                                   
+                                                text: 'Save Workspace'
+                                                on_press: root.show_extraer_popup('Save Workspace')
                                         ActionButton:
-                                                text: 'Clear Screen'
-                                                icon: "icons/clear_screen.png"
-                                                width: 50
-                                                on_release: root.clear_screen()      
+                                                text: 'Open Workspace'
+                                                on_press: root.parent.manager.current = 'saved screen'
                                         ActionButton:
-                                                text: 'Run Pipe'
-                                                icon: "icons/play.png"
-                                                width: 50
-                                                on_release: root.find_pipes()
+                                                text: 'New Workspace'
+                                                on_press: root.parent.manager.current = 'main screen' 
+                                MyActionButton:                                        
+                                        text: 'Export Code' 
+                                        icon: "icons/export_code.png"
+                                        width: root.width / 20 + self.ids.label.texture_size[0]                                        
+                                        release_fn: partial(root.show_extraer_popup, 'Export Code')
+                                MyActionButton:
+                                        text: 'Image Viewer'
+                                        icon: "icons/image_viewer.png"
+                                        width: root.width / 20 + self.ids.label.texture_size[0]
+                                        release_fn: partial(root.image_viewer)                        
+                                MyActionButton:
+                                        text: 'Clear Screen'
+                                        icon: "icons/clear_screen.png"
+                                        width: root.width / 20 + self.ids.label.texture_size[0]                                        
+                                        release_fn: partial(root.clear_screen)      
+                                MyActionButton:
+                                        text: 'Run Pipe'
+                                        icon: "icons/play.png"
+                                        width: root.width / 20 + self.ids.label.texture_size[0]
+                                        release_fn: partial(root.find_pipes)
                 AppMenu:
                         id: tool_bar
                         top: root.height - ActionView.size[1]
@@ -888,14 +882,33 @@
         on_release: self.parent.parent.select(self.text)
 
 <MyActionButton>:
+        release_fn: None
         orientation: "vertical"
+        spacing: 5
+        size_hint_x: None
         ActionButton:
                 text: "B1"
                 icon: root.icon
                 size_hint: 1, .8
                 pos_hint: {"center_x": 0.5}
-                on_release: eval(root.on_release)
+                on_release: root.release_fn()
         Label:
+                id: label
                 text: root.text
                 size_hint: 1, .2
 
+<HiddenIcon_ActionPrevious@ActionPrevious>:
+# para iconos a la izquierda:
+        title: ''   # app.title if app.title is not None else 'Action Previous'
+        with_previous: False
+        app_icon: ''
+        app_icon_width: 0
+        app_icon_height: 0
+        size_hint_x: None
+        width: len(self.title) * 10
+# para iconos a la derecha e icono de aplicación a la izquierda
+        #title: 'ProtoPype'   # app.title if app.title is not None else 'Action Previous'
+#      with_previous: False                                
+#     app_icon: "icons/pipe.png"
+#    app_icon_width: 40
+#   app_icon_height: 30

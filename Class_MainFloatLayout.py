@@ -1129,7 +1129,8 @@ class MyLabel(Label):
 class MyActionButton(BoxLayout, ActionItem):
     icon = kprop.StringProperty()
     text = kprop.StringProperty()
-    on_release = kprop.StringProperty()
+    myheight = kprop.NumericProperty()
+    mywidth = kprop.NumericProperty()
     pass
 
 class Save_image_button(BoxLayout):
