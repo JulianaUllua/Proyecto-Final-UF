@@ -264,13 +264,13 @@ class Bloque:
                             else:
                                 self.parameters[item] = 'no input'
 
-                            checkbox = MyCheckBox(item, False)
+                            checkbox = MyCheckBox(item, False, size_hint=(1,1))
                             checkbox.bind(active=self.add_input_buttons)
                             self.popup_bloque.ids.opcional_checkbox_input.add_widget(checkbox)
                         
                         for item in key['outputs_order']:
                             self.outputs[item] = 'no output'
-                            checkbox = MyCheckBox(item, False)
+                            checkbox = MyCheckBox(item, False, size_hint=(1,1))
                             checkbox.bind(active=self.add_output_buttons)
                             self.popup_bloque.ids.opcional_checkbox_output.add_widget(checkbox)
 
@@ -282,35 +282,35 @@ class Bloque:
                             if 'slider' in wid:
                                 for item in wid['slider']:
                                     self.parameters[item['label']]=item['value'] #save parameter value in the order of the JSON file
-                                    new_slider = MySlider(item['min'],item['max'],item['step'],item['value'],item['label'])
+                                    new_slider = MySlider(item['min'],item['max'],item['step'],item['value'],item['label'], size_hint= (.9, 1), pos_hint= {'center_x':0.5, 'center_y':1})
                                     self.popup_bloque.ids.variable_box.add_widget(new_slider)
                             if 'spinner' in wid:
                                 for item in wid['spinner']:
                                     self.parameters[item['label']]=eval(item['text'])
-                                    new_spinner = MySpinner(item['text'],item['values'],item['label'])
+                                    new_spinner = MySpinner(item['text'],item['values'],item['label'], size_hint= (.9, 1), pos_hint= {'center_x':0.5})
                                     self.popup_bloque.ids.variable_box.add_widget(new_spinner)
                             if 'image spinner' in wid:
                                 for item in wid['image spinner']:
                                     self.parameters[item['label']]=eval(item['text'])
-                                    new_image_spinner = MyImageSpinner(item['text'],item['label'], item['options'])
+                                    new_image_spinner = MyImageSpinner(item['text'],item['label'], item['options'], size_hint= (.9, 1), pos_hint= {'center_x':0.5})
                                     self.popup_bloque.ids.variable_box.add_widget(new_image_spinner)
                             if 'especial' in wid:
                                 eval(wid['especial'])
                             if 'toggle' in wid:
                                 for item in wid['toggle']:
                                     self.parameters[item['label']]=item['text 2']
-                                    new_toggle = MyToggleButton(item['text 1'], item['text 2'], item['label'])
+                                    new_toggle = MyToggleButton(item['text 1'], item['text 2'], item['label'], size_hint= (.9, 1), pos_hint= {'center_x':0.5})
                                     self.popup_bloque.ids.variable_box.add_widget(new_toggle)
                             if 'size' in wid:
                                 for item in wid['size']:
                                     self.parameters[item['label']]=((item['value 1'],item['value 2']))
                                     if item['specification']:
-                                        new_size_box = MySize(item['label'],item['input type 1'],item['input type 2'],item['value 1'], item['value 2'], item['specification']==True)
+                                        new_size_box = MySize(item['label'],item['input type 1'],item['input type 2'],item['value 1'], item['value 2'], item['specification']==True, size_hint= (.9, 1), pos_hint= {'center_x':0.5})
                                     self.popup_bloque.ids.variable_box.add_widget(new_size_box)
                             if 'text input' in wid:
                                 for item in wid['text input']:
                                     self.parameters[item['label']]=item['text'] #save parameter value in the order of the JSON file
-                                    new_text_input = MyTextInput(item['label'],item['input type'],item['text'])
+                                    new_text_input = MyTextInput(item['label'],item['input type'],item['text'], size_hint= (.9, 1), pos_hint= {'center_x':0.5})
                                     self.popup_bloque.ids.variable_box.add_widget(new_text_input)
                             if 'assign' in wid:
                                 for item in wid['assign']:
@@ -777,7 +777,6 @@ class MySlider(GridLayout):
     value_new = kprop.NumericProperty()
     slider_value = kprop.NumericProperty()
 
-
     def __init__(self, minimum, maximum, step, value, slider_label, **kwargs):
         super(MySlider, self).__init__(**kwargs)
         self.minimum = minimum #defaults to 0
@@ -892,4 +891,10 @@ class LoadDialog(GridLayout):
             print(newpath)
             pass
 
-
+class RoundedButton(Button):
+    line_color = kprop.ColorProperty()
+    pass
+    #def __init__(self, line_color, **kwargs):
+     #   super(RoundedButton, self).__init__(**kwargs)
+      #  self.line_color = line_color
+    

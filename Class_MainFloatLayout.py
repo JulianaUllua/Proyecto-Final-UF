@@ -15,9 +15,7 @@ from concurrent import futures
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 from functools import partial
-from PIL import Image
 
-import itertools
 import kivy.garden 
 #from kivy_garden.graph import Graph, MeshLinePlot
 #from kivy.garden.matplotlib import FigureCanvasKivyAgg
@@ -163,13 +161,17 @@ class MainFloatLayout(FloatLayout):
     def __init__(self, **kwargs):
         super(MainFloatLayout, self).__init__(**kwargs)
         
-    def new_bloque(self, value, scat_id = 0):
-        Fun = CFunction.BuscarFuncion(value)
-        if scat_id == 0:
-            scat_id = str(self.scatter_count)
-
+    def new_bloque(self, value, scat_id = "new"):
+        Fun = CFunction.search_function(value)
+        #if scat_id == 0:
+         #   scat_id = str(self.scatter_count)
+        if scat_id != "new":
+            while (int(scat_id) != self.scatter_count):
+                self.scatter_list.append(None)
+                self.scatter_count +=1
+        
         scatter = CScatter.MyScatterLayout(draw_line_pipe = self.draw_line_pipe, update_line = self.update_line, delete_scatter = self.delete_scatter, 
-                funcion = Fun, scatter_id = scat_id ,size=(150, 150) ,  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
+                funcion = Fun, scatter_id = str(self.scatter_count),size=(150, 150) ,  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
         if self.location < Window.system_size[0]* 0.8:
             self.location = self.location + 165
         else:
@@ -181,8 +183,8 @@ class MainFloatLayout(FloatLayout):
         if value == "Load Image":
             self.start_blocks.append(scatter.scatter_id) # para comenzar los paths desde estos
             
-            filename = r'C:\Users\trini\Pictures\lena.png'
-            #filename = r'C:\Users\Juliana\Pictures\cell.png'
+            #filename = r'C:\Users\trini\Pictures\lena.png'
+            filename = r'C:\Users\Juliana\Pictures\coins.jpg'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
         return scatter
@@ -200,13 +202,13 @@ class MainFloatLayout(FloatLayout):
                 self.button_output_aux = instance
                 mypos = [myscatter.pos[0] + pos[0] + instance.size[0], myscatter.pos[1] + pos[1] + instance.size[1]/2] #suma posicion del myscatter + posicion del button
                 self.line_flag = False
-                for line in self.lines_list:
+                for line in self.lines_list: #revisa las lineas existentes para que no permitir que se hagan dos sobre el mismo boton
                     if line.button_output == instance:
                         self.line_flag = True
                         break
 
                 if not self.line_flag:
-                    if myscatter.scatter_id in self.scats: #ver. se lo remueve de las listas para ponerlo en una nueva posicion, pero en caso de ser una segunda unión no habria que eliminarlo
+                    if myscatter.scatter_id in self.scats:
                         i = self.scats.index(myscatter.scatter_id) 
                         self.scats.remove(myscatter.scatter_id)
                         self.lines_array.pop(i)
@@ -244,6 +246,8 @@ class MainFloatLayout(FloatLayout):
                     i = self.scats.index(myscatter.scatter_id)
                     self.set_list(i,mypos, self.lines_array)
                     
+                    #points = [mypos1, mypos]
+
                     if self.line_flag:
                         points = [mypos1, mypos]
                     else:
@@ -307,11 +311,9 @@ class MainFloatLayout(FloatLayout):
         # se buscan los path
         for start in start_blocks:
             for finish in finish_blocks:
-                paths = self.find_all_paths(self.scatter_graph, start, finish)  
+                paths = self.find_all_paths(self.scatter_graph, start, finish)
                 if paths != None:
-                    print(paths)
                     for p in paths:
-                        print("p:",p)
                         if p != None:
                             # se crea pipe a partir del path
                             self.create_pipe(p) #ver. se puede hacer un constructor de la clase Pipeline
@@ -363,8 +365,6 @@ class MainFloatLayout(FloatLayout):
                 newpaths = self.find_all_paths(graph, node, end, path)
                 for newpath in newpaths:
                     paths.append(newpath)
-        paths.sort()
-        paths=list(paths for paths,_ in itertools.groupby(paths))
         return paths
 
     def create_pipe(self, path): 
@@ -410,7 +410,7 @@ class MainFloatLayout(FloatLayout):
             myline.clear_lines()
         self.lines_list.clear()
         self.lines_array.clear()
-        self.scatter_graph.clear()  
+        self.scatter_graph.clear()
     
     def popup_delete_line(self, line):
         show = Popup_Delete_Line(self, line)
@@ -430,11 +430,10 @@ class MainFloatLayout(FloatLayout):
         if self.scatter_graph[key] == set():
             del self.scatter_graph[key]             
 
-            
     def Export_Pipe_Code(self, filename):    
         self.extraer_popup.dismiss()
         dir = str(Path(__file__).parent.absolute())
-        with open(dir + '\\exported_code\\%s.py' %filename,'w+') as secondfile:
+        with open(dir + '\\autogenerated_code.py','w+') as secondfile:
             in_imag = [1] * self.scatter_count
             p_aux = []
             for x in range (0, self.scatter_count):
@@ -470,10 +469,6 @@ class MainFloatLayout(FloatLayout):
                                     for value in self.scatter_list[int(node)].parameters.values():
                                         if value != 'no input':
                                             parameters_aux = parameters_aux + "," + str(value) 
-                                        """elif isinstance(value, np.ndarray):
-                                            np.save("test.txt", value)
-                                            secondfile.write('"img_aux_{} ='.format(p) + str(np.load("test.txt")) + "\n")
-                                            parameters_aux = parameters_aux + "," + "\nimg_aux_{}".format(p)"""
       
                                     secondfile.write("\nimg_{} = {}".format(pipeline.pipe[i].scatter_id , self.scatter_list[int(node)].funcion.funcion + "(" + parameters_aux +")\n"))
                 s_c = s_c + 1
@@ -485,10 +480,9 @@ class MainFloatLayout(FloatLayout):
             except IndexError: 
                 pass            
 
-
-
     def show_extraer_popup(self, s = ""):
         show = Popup_Extraer_Codigo(self)
+<<<<<<< HEAD
         if s == 'Save Image':
             box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
             button = Save_image_button(self)
@@ -500,6 +494,11 @@ class MainFloatLayout(FloatLayout):
             box.add_widget(button)
             self.extraer_popup = Popup(title="Export Code As .py file", content=box,size_hint=(None,None),size=(400,150))
         if s == 'Save Workspace':
+=======
+        if s != "save":  
+            self.extraer_popup = Popup(title="Extraer Codigo", content=show,size_hint=(None,None),size=(400,150))
+        else:
+>>>>>>> Back-end
             box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
             button = Save_workspace_button(self)
             box.add_widget(button)
@@ -621,7 +620,7 @@ class MainFloatLayout(FloatLayout):
 
     def show_from_file_popup(self):
         dropdown = DropDown(size_hint_y = 1, size_hint_x =1) 
-        dir = str(Path(__file__).parent.absolute().joinpath('saved_workspaces')) 
+        dir = str(Path(__file__).parent.absolute().joinpath('saved_pipelines')) 
         with os.scandir(dir) as json_files:
             for element in json_files:
                 button = Button(text = str(element.name), size_hint_y = None, height = 40)
@@ -638,18 +637,22 @@ class MainFloatLayout(FloatLayout):
     def from_file(self, filename, *args):
         self.from_file_popup.dismiss()
         dir = str(Path(__file__).parent.absolute())
-        with open(dir + "\\saved_workspaces\\%s" %filename) as f:
+        with open(dir + "\\saved_pipelines\\%s" %filename) as f:
             data = json.load(f)
             scatter_g = (data['scatter_graph'])
+            self.scatter_graph = {}
             for key, value in scatter_g.items():
                 self.scatter_graph[key] = set(value)
-            self.start_blocks = data['start_blocks']
+            #self.start_blocks = data['start_blocks']
             self.scats = data['scats']
             
             for item in data["scatter_list"]:
                 if item is not None:
                     scatter = self.new_bloque(item['scatter']['nombre'],item['scatter']['scatter_id'])
                     scatter.parameters = (item['scatter']['parameters'])
+                    #ver otra forma de arreglar excepcion
+                    if item['scatter']['nombre'] == "Gaussian Blur":
+                        scatter.parameters["ksize"] = (scatter.parameters["ksize"][0], scatter.parameters["ksize"][1])
                     scatter.pos = item['scatter']['pos']
                     for button in scatter.ids.inputs.children:
                         if isinstance(button, CScatter.MyParameterButton):
@@ -665,13 +668,13 @@ class MainFloatLayout(FloatLayout):
                 self.lines_list.append(myline) 
                 self.ids.bloques_box.canvas.add(myline.line)
         
-        #self.find_pipes()            
+        self.find_pipes()            
 
     def to_file(self, filename):
         self.extraer_popup.dismiss()
         try:
             dir = str(Path(__file__).parent.absolute())
-            with open(dir + '\\saved_workspaces\\%s.json' % filename, 'w') as f:
+            with open(dir + '\\saved_pipelines\\%s.json' % filename, 'w') as f:
                     json_data = {
                         'scatter_graph' : self.scatter_graph,
                         'start_blocks' : self.start_blocks,
@@ -934,6 +937,7 @@ class FilterDD(Factory.DropDown):
     ignore_case = Factory.BooleanProperty(True)
     options = Factory.ListProperty()
     options_groups = Factory.ListProperty()
+    color_groups = Factory.ListProperty()
 
     def __init__(self, dismiss_on_select, **kwargs):
         self._needle = None
@@ -942,11 +946,14 @@ class FilterDD(Factory.DropDown):
         self.dismiss_on_select = dismiss_on_select
         super(FilterDD, self).__init__(**kwargs)
         groups = CFunction.orderby_groups()
-                
+        self.container.spacing = 5  
+
         for key, value in groups.items():
             self.options_groups.append(key)
             for element in value:
+                self.color_groups.append(CFunction.color[key])
                 self.options.append(element.nombre)
+                
 
     def on_options_groups(self, instance, values):
         _order = self._order
@@ -963,6 +970,8 @@ class FilterDD(Factory.DropDown):
         for txt in values:
             if txt not in _widgets:
                 _widgets[txt] = btn = Factory.DDButton(text=txt)
+                i = self.options.index(txt)
+                btn.line_color = (self.color_groups[i])
                 btn.bind()
                 _order.append(txt)
                 changed = True
@@ -1003,10 +1012,11 @@ class FilterDDTrigger(Factory.BoxLayout):
         super(FilterDDTrigger, self).__init__(**kwargs)
         self._prev_dd = None
         self._textinput = ti = Factory.TextInput(multiline=False, hint_text='Enter function name', size_hint=(0.5,None), height=30, pos_hint={'center_x':0.5, 'center_y':0.5}, 
-        background_color= (0.2, 0.2, 0.2, 1.0), foreground_color= (1,1,1,1), cursor_color= (1,1,1,1))
+        background_active="", background_color= (0.2, 0.2, 0.2, 1.0), foreground_color= (1,1,1,1), cursor_color= (1,1,1,1))
         ti.bind(text=self._apply_filter)
         ti.bind(on_text_validate=self._on_enter)
-        self._button = btn = Factory.Button(text=self.text, background_normal = '', background_down = '', background_disabled_normal= "", background_disabled_down= "")
+        #self._button = btn = Factory.Button(text=self.text, background_normal = '', background_down = '', background_disabled_normal= "", background_disabled_down= "")
+        self._button = btn = Factory.Button(text=self.text, background_normal = '', background_down = '')
         btn.background_color= (0.2, 0.71, 0.9, 1) if btn.state == 'down' else (0.2, 0.2, 0.2, 1.0)
         btn.bind(on_release=self._on_release)
         self.add_widget(btn)
@@ -1145,12 +1155,6 @@ class Save_image_button(BoxLayout):
 class Save_workspace_button(BoxLayout):
     def __init__(self, floatlayout, **kwargs):
         super(Save_workspace_button, self).__init__(**kwargs)
-        self.mainfloat = floatlayout
-    pass
-
-class Export_Code_button(BoxLayout):
-    def __init__(self, floatlayout, **kwargs):
-        super(Export_Code_button, self).__init__(**kwargs)
         self.mainfloat = floatlayout
     pass
 
