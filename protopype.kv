@@ -5,78 +5,85 @@
 
 <MainFloatLayout>:
         id: mainfloat
+                
         BoxLayout:
-                orientation:"vertical"
+                orientation:"horizontal"
                 size_hint: 1, 1
-                ActionBar:
-                        ActionView:
-                                id: ActionView
-                                 
-                                HiddenIcon_ActionPrevious:
-
-                                #ActionGroup:    
-                                ActionGroup:
-                                        id: App_ActionGroup
-                                        mode: 'spinner'
-                                        text: 'File'
-                                        dropdown_width: 150
-                                        width: 150
-                                        ActionButton:
+                BoxLayout:
+                        orientation:"vertical"
+                        size_hint: 0.06, 1
+                        spacing: 0      
+                        MyIconButton:
+                                text: 'File'
+                                source: "icons/image_viewer.png"
+                                on_release: dropdown_file.open(tool_bar)
+                                on_parent: dropdown_file.dismiss()     
+                                DropDown:
+                                        id: dropdown_file
+                                        size: 150, 30
+                                        size_hint: None, None
+                                        on_select: dd_btn.text = '{}'.format(args[1])
+                                        pos: tool_bar.pos
+                                        MyDropButton:
+                                                size_hint_y: None
+                                                height: '48dp'
                                                 text: 'Save Image' 
                                                 on_release: root.show_extraer_popup('Save Image')
-                                        ActionButton:
+                                                on_press: dropdown_file.dismiss()
+                                        MyDropButton:
                                                 text: 'Save Workspace'
                                                 on_press: root.show_extraer_popup('Save Workspace')
-                                        ActionButton:
+                                                on_press: dropdown_file.dismiss()
+                                                size_hint_y: None
+                                                height: '48dp'
+                                        MyDropButton:
                                                 text: 'Open Workspace'
                                                 on_press: root.parent.manager.current = 'saved screen'
-                                        ActionButton:
+                                                on_press: dropdown_file.dismiss()
+                                                size_hint_y: None
+                                                height: '48dp'
+                                        MyDropButton:
                                                 text: 'New Workspace'
-                                                on_press: root.parent.manager.current = 'main screen' 
-                                MyActionButton:                                        
-                                        text: 'Export Code' 
-                                        icon: "icons/export_code.png"
-                                        width: root.width / 20 + self.ids.label.texture_size[0]                                        
-                                        release_fn: partial(root.show_extraer_popup, 'Export Code')
-                                MyActionButton:
-                                        text: 'Image Viewer'
-                                        icon: "icons/image_viewer.png"
-                                        width: root.width / 20 + self.ids.label.texture_size[0]
-                                        release_fn: partial(root.image_viewer)                        
-                                MyActionButton:
-                                        text: 'Clear Screen'
-                                        icon: "icons/clear_screen.png"
-                                        width: root.width / 20 + self.ids.label.texture_size[0]                                        
-                                        release_fn: partial(root.clear_screen)      
-                                MyActionButton:
-                                        text: 'Run Pipe'
-                                        icon: "icons/play.png"
-                                        width: root.width / 20 + self.ids.label.texture_size[0]
-                                        release_fn: partial(root.find_pipes)
-                AppMenu:
-                        id: tool_bar
-                        top: root.height - ActionView.size[1]
-                        cancel_handler_widget: mainfloat
-
-                        FilterDDTrigger:
-                                size_hint: 0.2, 1
-                                text: 'Tool Bar'
-                                dropdown:
-                                        F.FilterDD(dismiss_on_select = False)
-                          
+                                                on_press: root.parent.manager.current = 'main screen'
+                                                on_press: dropdown_file.dismiss()
+                                                size_hint_y: None
+                                                height: '48dp'                           
+                        MyIconButton:
+                                text: 'Export Code'
+                                source: "icons/export_code.png"
+                        MyIconButton:
+                                text: 'Image Viewer'
+                                source: "icons/image_viewer.png"
+                        MyIconButton:
+                                text: 'Clear Screen'
+                                source: "icons/clear_screen.png"
+                        MyIconButton:
+                                text: 'Run Pipe'
+                                source: "icons/play.png"
+                 
                 FloatLayout:
                         id: bloques_box
-                        size_hint: 1, 0.88
+                        size_hint: 0.94, 1
                         canvas:
-                                Color:
-                                        rgba: 255, 255, 255, 255
-
+                                Rectangle:
+                                        pos: self.pos
+                                        size: self.size
+                                        source:"icons\\background.jpg"   
+                        FilterDDTrigger:
+                                id: tool_bar
+                                text: 'Tool Bar'
+                                size: 150, 30
+                                size_hint: None, None
+                                pos_hint: {"x": 0, "top": 1}
+                                dropdown:                                        
+                                        F.FilterDD(dismiss_on_select = False)
+                        
+                                        
 
 <MyScatterLayout>:
         BoxLayout:
                 id: scatter_box
                 canvas.before:
-                
                         Color:
                                 rgba: 1, 1, 1, 1
                         Line:
@@ -94,6 +101,7 @@
                         BoxLayout:
                                 orientation:"horizontal"
                                 size_hint: 1,.2
+                                
                                 MyButton: #para que no funcione touch down
                                         
                                         id: funcion_scatter
@@ -136,14 +144,14 @@
                                                 center_x: self.parent.center_x
                                                 center_y: self.parent.center_y
                                                 size: 20,20
-                                         
+                                       
                         MyButton:
                                 id: mybutton
-                                background_color: 0,0,0,0
+                                background_color: 150/255,78/255,194/255,0.5
                                 opacity: 1 if root.isShownMenu else 0
                                 canvas.before:
                                         Color:
-                                                rgba: 1, 1, 1, 1
+                                                rgba: 150/255,78/255,194/255,0.5
                                         Line:
                                                 width: 1
                                                 rounded_rectangle: self.x, self.y, self.width, self.height, 8, 20
@@ -667,8 +675,6 @@
                                         size_hint_y: None
                                         height: '48dp'
                                         on_release: dropdown_ex.select(".bmp")    
-
-                                   
                 BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -842,14 +848,31 @@
                         on_active: root.on_checkbox_active(self.active)
 
 <MyIconButton>:
-        on_press: self.background_color = (0, 1, 1, 1)
-        on_release: self.background_color = (0, 0, 0, 1)
+#        on_press: self.background_color = (0, 1, 1, 1)
+ #       on_release: self.background_color = (0, 0, 0, 1)
+        background_normal: ''
+        background_down: ''
+        background_disabled_normal: ""
+        background_disabled_down: ""
+        background_color: (0.2, 0.71, 0.9, 1) if self.state == 'down' else (0.2, 0.2, 0.2, 1.0)
+        font_size: 12
+        text_size: self.size     
+        halign: 'center'
+        valign: 'bottom'
+        padding_y: 5
         Image:
-                source:"icons\image_icon1.png"
+                source: root.source
                 center_x: self.parent.center_x
                 center_y: self.parent.center_y
                 size: 25,25
                 #allow_stretch: True
+
+<MyDropButton>:
+        background_normal: ''
+        background_down: ''
+        background_disabled_normal: ""
+        background_disabled_down: ""
+        background_color: (0.2, 0.71, 0.9, 1) if self.state == 'down' else (0.15, 0.15, 0.15, 1.0)
 
 <MyParameterButton>:
         on_press: self.background_color = (0, 1, 1, 1)
