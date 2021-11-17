@@ -498,6 +498,7 @@ class MyScatterLayout(Bloque, ScatterLayout):
                             
                             for n in range(cant_buttons_in):
                                 button_input = MyIconButton(background_color = [0, 0, 0, 0])
+                                button_input.source = "icons\image_icon1.png"
                                 self.ids.inputs.size_hint = .2, (.2 + .05*cant_buttons_in)
                                 self.ids.inputs.add_widget(button_input)
                                 buttoncallbackin = partial(self.draw_line_pipe, self, "inputs")
@@ -861,6 +862,7 @@ class MyParameterButton(Button):
     #    if touch.is_double_tap:  
     
 class MyIconButton(Button):
+    source = kprop.StringProperty()
     pass
 
 class Parameters_Popup(FloatLayout):

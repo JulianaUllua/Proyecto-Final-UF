@@ -49,7 +49,7 @@ from kivy.uix.actionbar import ActionItem
 from kivy.uix.label import Label
 from kivy.uix.bubble import Bubble
 from kivy.uix.popup import Popup
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager, Screen, RiseInTransition
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader, TabbedPanelItem
 
 from kivy.core.window import Window
@@ -72,7 +72,7 @@ Config.set('input', 'mouse', 'mouse,disable_multitouch')
 class ProtoPypeApp(App):
     
     def build(self):
-        sm = ScreenManager()
+        sm = ScreenManager(transition=RiseInTransition())
         mf = MainFloatScreen(name= 'main screen')
         mf.add_widget(MainFloatLayout())
         sm.add_widget(mf)
@@ -1131,6 +1131,9 @@ class MyActionButton(BoxLayout, ActionItem):
     text = kprop.StringProperty()
     myheight = kprop.NumericProperty()
     mywidth = kprop.NumericProperty()
+    pass
+
+class MyDropButton(Button):
     pass
 
 class Save_image_button(BoxLayout):
