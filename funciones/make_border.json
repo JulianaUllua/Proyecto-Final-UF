@@ -1,0 +1,44 @@
+[
+    {
+      "nombre": "Make Border",
+      "funcion": "cv2.copyMakeBorder",
+      "group": "Geometry",
+      "input images": 1,
+      "output images": 1,
+      "parameters_order": ["top", "bottom", "left", "right", "borderType"],
+      "outputs_order": ["dst"],
+      "widgets": [{
+        "text input": [
+            {
+                "input type": "int",
+                "text": 0,
+                "label": "top"
+            }, 
+            {
+                "input type": "int",
+                "text": 0,
+                "label": "bottom"
+            }, 
+            {
+                "input type": "int",
+                "text": 0,
+                "label": "left"
+            }, 
+            {
+                "input type": "int",
+                "text": 0,
+                "label": "right"
+            }],
+            "spinner": [
+                {
+                    "text":"cv2.BORDER_REPLICATE",
+                    "values":["cv2.BORDER_CONSTANT","cv2.BORDER_REPLICATE"],
+                    "label":"borderType"
+                }]
+        }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
+    }        
+]

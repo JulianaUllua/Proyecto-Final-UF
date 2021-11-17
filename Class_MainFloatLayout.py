@@ -19,8 +19,8 @@ from PIL import Image
 
 import itertools
 import kivy.garden 
-from kivy_garden.graph import Graph, MeshLinePlot
-from kivy.garden.matplotlib import FigureCanvasKivyAgg
+#from kivy_garden.graph import Graph, MeshLinePlot
+#from kivy.garden.matplotlib import FigureCanvasKivyAgg
 from kivy.app import App
 from kivy.config import Config
 import kivy.properties as kprop
@@ -180,8 +180,8 @@ class MainFloatLayout(FloatLayout):
         if value == "Load Image":
             self.start_blocks.append(scatter.scatter_id) # para comenzar los paths desde estos
             
-            filename = r'C:\Users\trini\Pictures\lena.png'
-            #filename = r'C:\Users\Juliana\Pictures\cell.png'
+            #filename = r'C:\Users\trini\Pictures\lena.png'
+            filename = r'C:\Users\Juliana\Pictures\cell.png'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
         return scatter

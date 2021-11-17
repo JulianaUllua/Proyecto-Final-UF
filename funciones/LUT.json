@@ -1,0 +1,16 @@
+[
+    {
+      "nombre": "LUT",
+      "funcion": "cv2.LUT",
+      "group": "Geometry",
+      "input images": 2,
+      "output images": 1,
+      "parameters_order": [""],
+      "outputs_order": ["dst"],
+      "widgets": [],
+      "information": [{
+          "function": "",
+          "parameters": "\n"
+      }]
+    }        
+]
