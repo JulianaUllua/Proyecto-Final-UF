@@ -21,6 +21,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.bubble import Bubble
 
 import kivy.graphics.transformation as ktransf
+from kivy.graphics import Rectangle
 import kivy.properties as kprop
 
 from kivy.uix.dropdown import DropDown
@@ -264,7 +265,7 @@ class Bloque:
                             else:
                                 self.parameters[item] = 'no input'
 
-                            checkbox = MyCheckBox(item, False, size_hint=(1,1))
+                            checkbox = MyCheckBox(item, False, size_hint=(1,1))                            
                             checkbox.bind(active=self.add_input_buttons)
                             self.popup_bloque.ids.opcional_checkbox_input.add_widget(checkbox)
                         
@@ -456,7 +457,6 @@ class Bloque:
     def dismiss_popup(self):
         self.parameters_popup.dismiss()
 
-
 class MyScatterLayout(Bloque, ScatterLayout):
 
     def __init__(self, draw_line_pipe, update_line, delete_scatter, funcion, scatter_id, **kwargs):
@@ -467,7 +467,7 @@ class MyScatterLayout(Bloque, ScatterLayout):
         #add content of parameters for the function to the popup
         #self.search_widgets()
         self.scatter_id = scatter_id
-        self.parameters_popup = Popup(title="Modificar Parametros", content=self.popup_bloque, size_hint=(None, None), size=(600, 500), auto_dismiss= False)
+        self.parameters_popup = Popup(title="Modify Parameters", content=self.popup_bloque, size_hint=(None, None), size=(600, 500), auto_dismiss= False, background = "icons\\background_mainfloat.png", separator_color=(51/255,83/255,158/255,1), title_align="center")
         self.ids.funcion_scatter.text = self.funcion.nombre
         self.ids.funcion_scatter.font_size = 10
         self.draw_line_pipe = draw_line_pipe
@@ -497,7 +497,7 @@ class MyScatterLayout(Bloque, ScatterLayout):
                             cant_buttons_in = key ['input images']
                             
                             for n in range(cant_buttons_in):
-                                button_input = MyIconButton(background_color = [0, 0, 0, 0])
+                                button_input = MyInputButton(background_color = [0, 0, 0, 0])
                                 button_input.source = "icons\image_icon1.png"
                                 self.ids.inputs.size_hint = .2, (.2 + .05*cant_buttons_in)
                                 self.ids.inputs.add_widget(button_input)
@@ -861,6 +861,14 @@ class MyParameterButton(Button):
     #    if touch.is_double_tap:  
     
 class MyIconButton(Button):
+    source = kprop.StringProperty()
+    pass
+
+class MyIconButtonLeft(Button):
+    source = kprop.StringProperty()
+    pass
+
+class MyInputButton(Button):
     source = kprop.StringProperty()
     pass
 

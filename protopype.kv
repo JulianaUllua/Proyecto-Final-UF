@@ -53,18 +53,22 @@
                                 text: 'Export Code'
                                 source: "icons/export_code.png"   
                                 background_color: 51/255,83/255,158/255,1
+                                on_press: root.show_extraer_popup('Export Code')
                         MyIconButton:
                                 text: 'Image Viewer'
                                 source: "icons/image_viewer.png"   
                                 background_color: 51/255,83/255,158/255,1
+                                on_release: root.image_viewer()
                         MyIconButton:
                                 text: 'Clear Screen'
                                 source: "icons/clear_screen.png"   
                                 background_color: 51/255,83/255,158/255,1
+                                on_release: root.clear_screen()
                         MyIconButton:
                                 text: 'Run Pipe'
                                 source: "icons/play.png"   
                                 background_color: 51/255,83/255,158/255,1
+                                on_release: root.find_pipes()
                  
                 FloatLayout:
                         id: bloques_box
@@ -272,36 +276,47 @@
                 BoxLayout:
                         orientation:"horizontal"
                         size_hint: 1, .9
-                        id:boxlay
-        
+                        id:boxlay                        
                         TabbedPanel:
                                 size_hint: .5, 1
                                 do_default_tab: False
                                 TabbedPanelItem:
                                         text: 'Parameters'
+                                        background_normal: ''
+                                        background_down: ''
+                                        background_disabled_normal: ""
+                                        background_disabled_down: ""
+                                        background_color: 51/255,83/255,158/255,1
                                         BoxLayout:
+                                                canvas.before:                
+                                                        #Color:
+                                                         #       rgba: 232/255,183/255,212/255,1
+                                                        Rectangle:
+                                                                pos: self.pos
+                                                                size: self.size    
+                                                                source:"icons\\background_myscatter.png"                                     
                                                 orientation: "vertical"
-                                                id: variable_box
-                                                canvas.before:
-                                                        Color:
-                                                                rgba: 0.2, 0.71, 0.9, 1
-                                                        Line:
-                                                                width: 1
-                                                                rounded_rectangle: self.x, self.y, self.width, self.height, 8, 100
+                                                id: variable_box                                                
                                 TabbedPanelItem:
                                         text: 'Optional'
+                                        #on_press: self.background_color = (0, 0, 0, 0)
+                                        #on_release: self.background_color = (0, 0, 0, 0)
+                                        background_normal: ''
+                                        background_down: ''
+                                        background_disabled_normal: ""
+                                        background_disabled_down: ""
+                                        background_color: 51/255,83/255,158/255,1
                                         BoxLayout:
-                                                orientation: "vertical"
-                                                canvas.before:
-                                                        Color:
-                                                                rgba: 0.2, 0.71, 0.9, 1
-                                                        Line:
-                                                                width: 1
-                                                                rounded_rectangle: self.x, self.y, self.width, self.height, 8, 100
+                                                canvas.before:                
+                                                        Rectangle:
+                                                                pos: self.pos
+                                                                size: self.size    
+                                                                source:"icons\\background_myscatter.png" 
+                                                orientation: "vertical"                                                
                                                 BoxLayout:
                                                         orientation: "vertical"
                                                         size_hint: .9, .5
-                                                        pos_hint: {'center_x':0.5, 'center_y':1}                                                        
+                                                        pos_hint: {'center_x':0.5, 'center_y':1}     
                                                         Label:
                                                                 text: "Input:"
                                                                 height: 20
@@ -309,7 +324,8 @@
                                                         BoxLayout:
                                                                 orientation: "vertical"
                                                                 id: opcional_checkbox_input
-                                                                size_hint: 1, .7
+                                                                size_hint: 1, .7  
+                                                                                                                             
                                                                 canvas.after:
                                                                         Color:
                                                                                 rgba: 0.2, 0.71, 0.9, 1
@@ -346,46 +362,42 @@
                                                 
                 BoxLayout:
                         orientation: "horizontal"
-                        size_hint: 1, .1
-                        spacing: 5
-                        RoundedButton:
+                        size_hint: 1, .12
+                        spacing: 0
+                        MyIconButtonLeft:
                                 id: btn_restore_parametros
                                 size_hint: 0.9, 0.9
                                 text: "Default"
-                                halign: 'center'
-                                valign: 'center'
                                 text_size: self.width - dp(10), self.height - dp(10)
-                                on_press: root.restore_parameters() 
-                        RoundedButton:
+                                on_press: root.restore_parameters()
+                                source: "icons/restore.png"   
+                        MyIconButtonLeft:
                                 id: btn_try_parametros
                                 size_hint: 0.9, 0.9
                                 text: "Try"
-                                halign: 'center'
-                                valign: 'center'
                                 text_size: self.width - dp(10), self.height - dp(10)
                                 on_press: root.try_parameters()
-                        RoundedButton:
+                                source: "icons/play.png"   
+                        MyIconButtonLeft:
+                                source: "icons/duplicate.png"   
                                 id: btn_duplicate
                                 size_hint: 0.9, 0.9
                                 text: "Duplicate"
-                                halign: 'center'
-                                valign: 'center'
                                 text_size: self.width - dp(10), self.height - dp(10)
                                 on_press: root.duplicate()
-                        RoundedButton:
+                        MyIconButtonLeft:
                                 id: btn_guardar_parametros
                                 size_hint: 0.9, 0.9
                                 text: "Save"
-                                halign: 'center'
-                                valign: 'center'
                                 on_press: root.save_parameters() 
-                        RoundedButton:
+                                source: "icons/check-circle.png"   
+                        MyIconButtonLeft:
                                 id: btn_cancelar_parametros
                                 size_hint: 0.9, 0.9
                                 text: "Cancel"
-                                halign: 'center'
-                                valign: 'center'
                                 on_press: root.cancel_parameters() 
+                                source: "icons/cancel.png"   
+                                
 
 <MyToggleButton>:
         id: MyToggleButton
@@ -738,8 +750,7 @@
                         multiline: False
                         text: "saved_code"
                         on_text_validate: root.mainfloat.Export_Pipe_Code(filename_in.text)
-                                
-                        
+                                       
                 BoxLayout:
                         orientation: 'horizontal'
                         Button:
@@ -750,6 +761,7 @@
                                 text: "Save"
                                 size_hint: .3,.9
                                 on_press: root.mainfloat.Export_Pipe_Code(filename_in.text)
+                                
 <Extension_Dropdown>:
         Button:
                 text: "File Format:"
@@ -876,6 +888,11 @@
         font_size: '15sp'
         BoxLayout:
                 orientation: 'horizontal'
+                canvas.before:                
+                        Rectangle:
+                                pos: self.pos
+                                size: self.size    
+                                source:"icons\\background_myscatter.png"  
                 Label:
                         text: ""
                 Label:
@@ -892,6 +909,50 @@
                         on_active: root.on_checkbox_active(self.active)
 
 <MyIconButton>:
+        #on_press: self.background_color = (0, 0, 0, 0)
+        #on_release: self.background_color = (0, 0, 0, 0)
+        background_normal: ''
+        background_down: ''
+        background_disabled_normal: ""
+        background_disabled_down: ""
+        background_color: 0, 0, 0, 0
+        #background_color: (0.2, 0.71, 0.9, 1) if self.state == 'down' else (0.2, 0.2, 0.2, 1.0)
+        font_size: 12
+        text_size: self.size     
+        halign: 'center'
+        valign: 'bottom'
+        padding_y: 5
+        Image:
+                id: image
+                source: root.source
+                center_x: self.parent.center_x
+                center_y: self.parent.center_y
+                size: 25,25
+                #allow_stretch: True
+
+<MyIconButtonLeft>:
+        #on_press: self.background_color = (0, 0, 0, 0)
+        #on_release: self.background_color = (0, 0, 0, 0)
+        background_normal: ''
+        background_down: ''
+        background_disabled_normal: ""
+        background_disabled_down: ""
+        background_color: 51/255,83/255,158/255,1
+        #background_color: (0.2, 0.71, 0.9, 1) if self.state == 'down' else (0.2, 0.2, 0.2, 1.0)
+        font_size: 12
+        text_size: self.size     
+        halign: 'center'
+        valign: 'center'
+        #padding_y: 5
+        Image:
+                id: image
+                source: root.source
+                center_x: self.parent.center_x - 34
+                center_y: self.parent.center_y
+                size: 25,25
+                #allow_stretch: True
+
+<MyInputButton>:
         on_press: self.background_color = (0, 0, 0, 0)
         on_release: self.background_color = (0, 0, 0, 0)
         background_normal: ''

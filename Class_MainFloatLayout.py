@@ -651,7 +651,7 @@ class MainFloatLayout(FloatLayout):
                     for button in scatter.ids.inputs.children:
                         if isinstance(button, CScatter.MyParameterButton):
                             input = button
-                        if isinstance(button, CScatter.MyIconButton):
+                        if isinstance(button, CScatter.MyInputButton):
                             input = button
                     for button in scatter.ids.outputs.children:
                         if isinstance(button, CScatter.MyParameterButton):
@@ -1075,6 +1075,9 @@ class MyDropButton(Button):
     pass
 
 class Export_Code_Button(Button):
+    def __init__(self, floatlayout, **kwargs):
+        super(Export_Code_Button, self).__init__(**kwargs)
+        self.mainfloat = floatlayout
     pass
 
 class Save_Image_Button(BoxLayout):
