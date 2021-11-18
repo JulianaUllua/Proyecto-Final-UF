@@ -947,7 +947,6 @@ class FilterDD(Factory.DropDown):
             for element in value:
                 self.color_groups.append(CFunction.color[key])
                 self.options.append(element.nombre)
-                
 
     def on_options_groups(self, instance, values):
         _order = self._order
@@ -1005,11 +1004,11 @@ class FilterDDTrigger(Factory.BoxLayout):
     def __init__(self, **kwargs):
         super(FilterDDTrigger, self).__init__(**kwargs)
         self._prev_dd = None
-        self._textinput = ti = Factory.TextInput(multiline=False, hint_text='Enter function name', size_hint=(0.5,None), height=30, pos_hint={'center_x':0.5, 'center_y':0.5}, 
+        self._textinput = ti = Factory.DDTextInput(multiline=False, hint_text='Search function', size_hint=(0.5,None), height=30, pos_hint={'center_x':0.5, 'center_y':0.5}, 
         background_color= (0, 0, 0, 0), foreground_color= (1,1,1,1), cursor_color= (1,1,1,1))
         ti.bind(text=self._apply_filter)
         ti.bind(on_text_validate=self._on_enter)
-        self._button = btn = Factory.DDToolbar_Button(text=self.text)
+        self._button = btn = Factory.DDToolbar_Button(text=self.text, halign= 'left')
         btn.bind(on_release=self._on_release)
         self.add_widget(btn)
 
@@ -1062,7 +1061,7 @@ class MyLabel(Label):
         super(MyLabel, self).__init__(**kwargs)
         pass
 
-class DDTextInput(BoxLayout):
+class DDTextInput(TextInput):
     pass
 
 class MyActionButton(BoxLayout, ActionItem):
