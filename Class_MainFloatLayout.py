@@ -401,8 +401,10 @@ class MainFloatLayout(FloatLayout):
             
             self.scatter_graph = {key:val for key, val in self.scatter_graph.items() if key != myscatter.scatter_id}
 
-    def clear_screen(self):
-        self.ids.bloques_box.clear_widgets()
+    def clear_screen(self):        
+        for child in self.ids.bloques_box.children[:-1]:
+            self.ids.bloques_box.remove_widget(child)
+        self.location= Window.system_size[0]*0.10
         self.scatter_list.clear()
         self.scatter_count = 0
         self.scats.clear()
@@ -414,7 +416,7 @@ class MainFloatLayout(FloatLayout):
     
     def popup_delete_line(self, line):
         show = Popup_Delete_Line(self, line)
-        self.delete_line_popup = Popup(title="Delete Line", content=show,size_hint=(None,None),size=(400,150))
+        self.delete_line_popup = Popup(title="Delete Line", content=show,size_hint=(None,None),size=(400,150), background = "icons\\background_mainfloat.png", separator_color=(51/255,83/255,158/255,1), title_align="center")
         self.delete_line_popup.open()
 
     def delete_line(self, line):
@@ -476,29 +478,29 @@ class MainFloatLayout(FloatLayout):
                 finish_blocks = self.list_toposort[-1]
                 for f in finish_blocks:
                     secondfile.write("\ncv2.imshow('Imagen Resultado', img_{})\ncv2.waitKey(0)".format(f))  
-                    secondfile.write("\n")
+                    secondfile.write("\n")                
+                show = Popup_Extraer_Codigo(self)
+                show.open()
             except IndexError: 
                 pass            
 
     def show_extraer_popup(self, s = ""):
-        show = Popup_Extraer_Codigo(self)
         if s == 'Save Image':
             box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
             button = Save_Image_Button(self)
             box.add_widget(button)
-            self.extraer_popup = Popup(title="Save Image(s) As", content=box,size_hint=(None,None),size=(400,150))
+            self.extraer_popup = Popup(title="Save Image(s) As", content=box,size_hint=(None,None),size=(400,150), background = "icons\\background_mainfloat.png", separator_color=(51/255,83/255,158/255,1), title_align="center")
         if s == 'Export Code':  
             box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
             button = Export_Code_Button(self)
             box.add_widget(button)
-            self.extraer_popup = Popup(title="Export Code As .py file", content=box,size_hint=(None,None),size=(400,150))
+            self.extraer_popup = Popup(title="Export Code As .py file", content=box,size_hint=(None,None),size=(400,150), background = "icons\\background_mainfloat.png", separator_color=(51/255,83/255,158/255,1), title_align="center")
         if s == 'Save Workspace':
             box = GridLayout(rows = 2, row_force_default=True, row_default_height=80)
             button = Save_Workspace_Button(self)
             box.add_widget(button)
-            self.extraer_popup = Popup(title="Save Pipeline As", content=box,size_hint=(None,None),size=(400,150))
+            self.extraer_popup = Popup(title="Save Pipeline As", content=box,size_hint=(None,None),size=(400,150), background = "icons\\background_mainfloat.png", separator_color=(51/255,83/255,158/255,1), title_align="center")
         self.extraer_popup.open()
-
 
     def dismiss_extraer_popup(self):
         self.extraer_popup.dismiss()
@@ -508,7 +510,7 @@ class MainFloatLayout(FloatLayout):
         iv = ImageViewer()
         for scat in self.scatter_list:
             if scat != None:
-                th = TabbedPanelHeader( text='%d: %s' % (self.scatter_list.index(scat)+1, scat.funcion.nombre))
+                th = TabbedPanelHeader( text='%d: %s' % (self.scatter_list.index(scat)+1, scat.funcion.nombre), background_normal= '',background_down= '', background_disabled_normal= "", background_disabled_down= "", background_color= (51/255,83/255,158/255,1))
                 th.width = th.texture_size[0]
                 th.padding = 30,0
                 th.font_size = '12sp'
@@ -541,7 +543,7 @@ class MainFloatLayout(FloatLayout):
 
                 iv.add_widget(th)
 
-        self.popup = Popup(title='Image Viewer', content=iv, size_hint=(.9, .9), size=Window.size)
+        self.popup = Popup(title='Image Viewer', content=iv, size_hint=(.9, .9), size=Window.size, background = "icons\\background_mainfloat.png", separator_color=(51/255,83/255,158/255,1), title_align="center")
         self.popup.open()
 
 
@@ -625,7 +627,7 @@ class MainFloatLayout(FloatLayout):
         mainbutton = Button(text='Select workspace', size_hint=(500, 150))
         mainbutton.bind(on_release=dropdown.open)
         dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
-        self.from_file_popup = Popup(title="Open workspace", content=dropdown,size_hint=(None,None), size = (500,200))
+        self.from_file_popup = Popup(title="Open workspace", content=dropdown,size_hint=(None,None), size = (500,200), background = "icons\\background_mainfloat.png", separator_color=(51/255,83/255,158/255,1), title_align="center")
         self.from_file_popup.open()
 
     def from_file(self, filename, *args):
@@ -1074,7 +1076,7 @@ class MyActionButton(BoxLayout, ActionItem):
 class MyDropButton(Button):
     pass
 
-class Export_Code_Button(Button):
+class Export_Code_Button(BoxLayout):
     def __init__(self, floatlayout, **kwargs):
         super(Export_Code_Button, self).__init__(**kwargs)
         self.mainfloat = floatlayout

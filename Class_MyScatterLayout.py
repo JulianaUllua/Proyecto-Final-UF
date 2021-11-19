@@ -237,13 +237,13 @@ class Bloque:
         
     def save_input(self,obj):
         print(obj.text)
-        self.popup_save_input = Popup(title='Select %s' %obj.text, size_hint=(None, None), size= (500,500))
+        self.popup_save_input = Popup(title='Select %s' %obj.text, size_hint=(None, None), size= (500,500), background = "icons\\background_mainfloat.png", separator_color=(51/255,83/255,158/255,1), title_align="center")
         self.popup_save_input.open()
         pass
 
     def save_output(self,obj):
         print(obj.text)
-        self.popup_save_output = Popup(title='Select %s' %obj.text, size_hint=(None, None), size= (500,500))
+        self.popup_save_output = Popup(title='Select %s' %obj.text, size_hint=(None, None), size= (500,500), background = "icons\\background_mainfloat.png", separator_color=(51/255,83/255,158/255,1), title_align="center")
         self.popup_save_output.open()
         pass
 
@@ -441,8 +441,8 @@ class Bloque:
 
     # para class LoadDialog
     def load_dialog(self):
-        self.popup_bloque.ids.boxlay.clear_widgets()
-        self.popup_bloque.ids.boxlay.add_widget(LoadDialog(load=self.load, cancel=self.dismiss_popup))
+        self.popup_bloque.ids.parameters_popup.clear_widgets()
+        self.popup_bloque.ids.parameters_popup.add_widget(LoadDialog(load=self.load, cancel=self.dismiss_popup))
 
     def load(self, path, filename):
         filename = os.path.join(path, filename[0])
