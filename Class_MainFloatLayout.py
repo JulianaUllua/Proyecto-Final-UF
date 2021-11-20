@@ -478,11 +478,13 @@ class MainFloatLayout(FloatLayout):
                 finish_blocks = self.list_toposort[-1]
                 for f in finish_blocks:
                     secondfile.write("\ncv2.imshow('Imagen Resultado', img_{})\ncv2.waitKey(0)".format(f))  
-                    secondfile.write("\n")                
-                show = Popup_Extraer_Codigo(self)
-                show.open()
+                    secondfile.write("\n")
             except IndexError: 
-                pass            
+                pass         
+                        
+        show = Popup_Extraer_Codigo(self)
+        export_code_popup = Popup(title="Export Code", content = show,size_hint=(None,None),size=(400,150), background = "icons\\background_mainfloat.png", separator_color=(51/255,83/255,158/255,1), title_align="center")
+        export_code_popup.open()   
 
     def show_extraer_popup(self, s = ""):
         if s == 'Save Image':

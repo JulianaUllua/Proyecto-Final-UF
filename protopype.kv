@@ -593,12 +593,12 @@
                 size_hint: 0.6,1   
                 font_size: '12sp'
 
-<MyBubble>:
+<MyBubble>: #no se usa
         size_hint: (None, None)
         size: (100, 75)
         #pos_hint: {'x': 1, 'y': 1}
         BubbleButton:
-                text: 'Eliminar'
+                text: 'Delete'
                 on_touch_down: print('touch')
 
 <LoadDialog>:
@@ -664,7 +664,7 @@
 
 <Popup_Extraer_Codigo>:
         Label:
-                text: "Su codigo se ha exportado exitosamente"
+                text: "The code was successfully exported"
                 size_hint: None, None
                 pos_hint: {"x":0.35, "top":1}
 
