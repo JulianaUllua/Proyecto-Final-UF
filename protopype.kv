@@ -843,85 +843,54 @@
                         id: view_image
                         source: ""
                         color: 0,1,0,1  
-                        size_hint: .9,1
+                        size_hint: .7,1
                 BoxLayout:
                         orientation: 'vertical'
+                        size_hint: .3,1
+                        spacing: 2
                         canvas.before:                
                                 Rectangle:
                                         pos: self.pos
                                         size: self.size    
                                         source:"icons\\background_myscatter.png"
                         Label:
-                                pos_hint: {"center_x": 0.5}
+                                pos_hint: {"x":0, "top": 0}
                                 text: root.text
                                 markup: True
-                                #size_hint: .2,.1
-                        
+                                size_hint: .97,.25
                         Label:
-                                size_hint: .2,.1
-                                pos_hint: {"center_x": 0.5}
-                                text: "Zoom"
+                                size_hint: .97,.05
+                                pos_hint: {"center_x": 0.5, "top": 0}
+                                text: "Zoom:"
                                 bold: True
                                 font_size:'15sp'
-
                         StencilBox:
                                 id: box_zoom_im
                                 pos_hint: {"center_x": 0.5}
-                                size_hint: 0.7,0.7
-                                size: self.size
-                                pos: self.pos
+                                size_hint: 0.97,0.5
 
                                 MyScatterPlane:
-                                        pos_hint: {'center_x':-1,'center_y':-0.5}
                                         do_rotation: False
+                                        size_hint: 1,1
                                         Image:
                                                 id: view_image_z
                                                 source: ""
                                                 color: 0,1,0,1  
-                                                size_hint: (None,None)
-                                                #size: box_zoom_im.size 
-                                                size: 500,500
-                                                
-                        Label:
-                                size_hint: .2,.2
-
+                                                size_hint: 1,1
+                                                size: box_zoom_im.size 
+                                                #size: 500,500                                                
                         MyColorButton:
                                 pos_hint: {"center_x": 0.5}
                                 id: histogram
                                 text: "View Histogram"
-                                size_hint: .4,.3
+                                size_hint: .97,.1
                                 on_release: root.view_histogram()
-                                background_color: (0,0,0,0)
-                                background_normal: ''
-
-                                canvas.before:
-                                        Color:
-                                                rgb: (48/255,84/255,150/255,1)
-                                        RoundedRectangle:
-                                                size: self.size
-                                                pos: self.pos
-                                                radius: [30]
-                        Label:
-                                size_hint: .2,.2
                         MyColorButton:
                                 pos_hint: {"center_x": 0.5}
                                 id: save_image_button
                                 text: "Save Image"
-                                size_hint: .4,.3
-                                on_release: root.mainfloat.show_extraer_popup('Save Image')
-                                background_color: (0,0,0,0)
-                                background_normal: ''
-
-                                canvas.before:
-                                        Color:
-                                                rgba: (48/255,84/255,150/255,1)
-                                        RoundedRectangle:
-                                                size: self.size
-                                                pos: self.pos
-                                                radius: [30]
-                        Label:
-                                size_hint: .2,.2
-                       
+                                size_hint: .97,.1
+                                on_release: root.mainfloat.show_extraer_popup('Save Image')                       
 
 <MyCheckBox>:
         width: self.parent.width if self.parent else 0

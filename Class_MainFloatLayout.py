@@ -528,7 +528,7 @@ class MainFloatLayout(FloatLayout):
                     texture.blit_buffer(image.tobytes(order=None), colorfmt= scat.colorfmt, bufferfmt='ubyte')
                     texture.flip_vertical()
 
-                    text = ("[b]Statistics[/b]" + '\nDimensions: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
+                    text = ("[b]Statistics:[/b]" + '\nDimensions: {}'.format(image.ndim) + '\nShape: {}'.format(image.shape) + 
                             '\nHeight: {}'.format(image.shape[0]) + '\nWidth: {}'.format(image.shape[1])) 
                     mywidget = MyWidget(text, scat, self)
                     mywidget.ids.view_image.color = (1,1,1,1)
@@ -917,16 +917,22 @@ class MyLine:
         self.button_input = button_input
         self.line = kins.InstructionGroup()
         self.points = points
-        self.line.add(Line(points=points, width=1))
-        self.line.add(Ellipse(pos=(points[0][0]-6, points[0][1]-5), size=(7,7)))
-        self.line.add(Ellipse(pos=(points[1][0]-6, points[1][1]-5), size=(7,7)))
+        #self.line.add(Color(0, 1, 0, 1))
+        #self.line.add(Line(points=points, width=1))
+        self.line.add(Color(0, 1, 0, .6))
+        self.line.add(Line(points=points, width=1.5))
+        #self.line.add(Ellipse(pos=(points[0][0]-6, points[0][1]-5), size=(7,7)))
+        #self.line.add(Ellipse(pos=(points[1][0]-6, points[1][1]-5), size=(7,7)))
         self.scat_inp = scat_inp #MyScatterLayout
 
     def update_line(self, points):
         self.line.clear()
-        self.line.add(Line(points=points, width=1))
-        self.line.add(Ellipse(pos=(points[0][0]-6, points[0][1]-5), size=(7,7)))
-        self.line.add(Ellipse(pos=(points[1][0]-6, points[1][1]-5), size=(7,7)))
+        #self.line.add(Color(0, 1, 0, 1))
+        #self.line.add(Line(points=points, width=1))
+        self.line.add(Color(0, 1, 0, .6))
+        self.line.add(Line(points=points, width=1.5))
+        #self.line.add(Ellipse(pos=(points[0][0]-6, points[0][1]-5), size=(7,7)))
+        #self.line.add(Ellipse(pos=(points[1][0]-6, points[1][1]-5), size=(7,7)))
     
     def clear_lines(self):
         self.line.clear()
