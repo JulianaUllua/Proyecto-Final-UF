@@ -90,12 +90,15 @@
 <MyScatterLayout>:
         BoxLayout:
                 id: scatter_box
-                canvas.before:
+                spacing: 5
+                canvas.before:     
                         Color:
-                                rgba: 1, 1, 1, 1
+                                rgba: 1,1,1,1
+                                #rgba: 165/255,103/255,142/255,1
                         Line:
                                 width: 0.000000001 if root.isShownMenu else 1
-                                rounded_rectangle: 28, 118, 96, 30, 8, 20
+                                rounded_rectangle: self.x+30, self.y+self.height-30, self.width-60, 30, 8, 20
+                
                 BoxLayout:
                         orientation: "vertical"
                         id: inputs 
@@ -155,7 +158,7 @@
                         MyButton:
                                 id: mybutton
                                 background_color: 0,0,0,0
-                                #opacity: 1 if root.isShownMenu else 0
+                                opacity: 1 if root.isShownMenu else 0
                                 canvas.before:
                                         #Color:
                                                 #rgba: 150/255,78/255,194/255,1
@@ -184,20 +187,20 @@
                         orientation: "vertical"
                         #opacity: 1 if root.isShownMenu else 0
                         id: outputs    
-                        size_hint: .2, 0  
+                        size_hint: .2, 0
                         pos_hint: {'x': 0.75, 'y': 0.35} if root.isShownMenu else {'x': 0.75, 'y': 0.75}   
         BoxLayout:
                 orientation: "vertical"
                 #no se usa, lo dejo por las dudas
-                ContextMenu:
-                        id: context_menu
-                        visible: False
-                        cancel_handler_widget: scatter_box
-                        pos_hint: {'x': 0.5, 'y': 0.5}
+                #ContextMenu:
+                 #       id: context_menu
+                  #      visible: False
+                   #     cancel_handler_widget: scatter_box
+                    #    pos_hint: {'x': 0.5, 'y': 0.5}
                         
-                        ContextMenuTextItem:
-                                text: "Duplicate"
-                                on_release: root.duplicate()
+                     #   ContextMenuTextItem:
+                      #          text: "Duplicate"
+                       #         on_release: root.duplicate()
                                                     
                         #ContextMenuTextItem:
                         #        text: "Edit outputs"
@@ -514,7 +517,7 @@
 
 <MySlider>:
         id: myslider
-        orientation: "horizontal"
+        #orientation: "horizontal"
         halign: 'left'
         valign: 'left'
         Label:
@@ -539,7 +542,7 @@
                 Slider:
                         id: slider
                         value_track: True
-                        value_track_color: [1, 0, 0, 1]
+                        value_track_color: [51/255,83/255,158/255,1]
                         min: root.minimum
                         max: root.maximum
                         step: root.step
@@ -571,7 +574,7 @@
 
 <MySpinner>:
         id: myspinner
-        orientation: "vertical"
+        #orientation: "vertical"
         Label:
                 text: root.spinner_label + ":"
                 size_hint: 0.4,1

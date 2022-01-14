@@ -2,11 +2,11 @@
 import kivy
 import os
 from pathlib import Path
-from kivy.uix.behaviors.button import ButtonBehavior
-from kivy_garden.contextmenu.context_menu import ContextMenuDivider
+##from kivy.uix.behaviors.button import ButtonBehavior
+#from kivy_garden.contextmenu.context_menu import ContextMenuDivider
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
+#import matplotlib
+#import matplotlib.pyplot as plt
 import json
 from cv2 import cv2
 from numpy.lib.type_check import imag
@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 from functools import partial
 
-import kivy.garden 
+#import kivy.garden 
 #from kivy_garden.graph import Graph, MeshLinePlot
 #from kivy.garden.matplotlib import FigureCanvasKivyAgg
 from kivy.app import App
@@ -27,8 +27,8 @@ from kivy.lang import Builder
 from kivy.factory import Factory
 from kivy.base import runTouchApp
 
-import kivy_garden.contextmenu
-from kivy_garden.contextmenu import AbstractMenuItem
+#import kivy_garden.contextmenu
+#from kivy_garden.contextmenu import AbstractMenuItem
 
 #import widgets:
 from kivy.uix.floatlayout import FloatLayout
@@ -56,6 +56,7 @@ from kivy.properties import ObjectProperty
 from kivy.graphics.texture import Texture
 from kivy.graphics import Color, Ellipse, Line, Rectangle, Bezier 
 import kivy.graphics.instructions as kins
+
 from kivy.graphics.transformation import Matrix
 
 #import modulo clase
@@ -171,7 +172,7 @@ class MainFloatLayout(FloatLayout):
                 self.scatter_count +=1
         
         scatter = CScatter.MyScatterLayout(draw_line_pipe = self.draw_line_pipe, update_line = self.update_line, delete_scatter = self.delete_scatter, 
-                funcion = Fun, scatter_id = str(self.scatter_count),size=(150, 150) ,  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
+                funcion = Fun, scatter_id = str(self.scatter_count),size=(170, 150) ,  size_hint=(None, None), pos=(self.location + 100,(Window.system_size[1]/2)))
         if self.location < Window.system_size[0]* 0.8:
             self.location = self.location + 165
         else:
@@ -184,7 +185,7 @@ class MainFloatLayout(FloatLayout):
             self.start_blocks.append(scatter.scatter_id) # para comenzar los paths desde estos
             
             #filename = r'C:\Users\trini\Pictures\lena.png'
-            filename = r'C:\Users\Juliana\Pictures\coins.jpg'
+            filename = r'C:\Users\Juliana\Pictures\cell.png'
             #filename = r'C:\Users\Juliana\Downloads\18_08_21\coins.jpg'
             scatter.inputs.append(filename)
         return scatter

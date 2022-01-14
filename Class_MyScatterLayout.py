@@ -35,9 +35,9 @@ from kivy.event import EventDispatcher
 from kivy.clock import Clock
 from functools import partial
 
-import kivy_garden.contextmenu
-from kivy_garden.contextmenu import ContextMenuTextItem
-from kivy_garden.contextmenu import ContextMenuItem
+#import kivy_garden.contextmenu
+#from kivy_garden.contextmenu import ContextMenuTextItem
+#from kivy_garden.contextmenu import ContextMenuItem
 # pylint: disable=no-member
 # esta linea arregla poder llamar atributos de Bloque en MyScatter
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -835,7 +835,7 @@ class MyImageSpinner(GridLayout):
         self.ids.spinner.values = self.options.keys()
         self.ids.imageplan.source = self.options.get(self.ids.spinner.text)
 
-class MyCheckBox(ContextMenuItem, GridLayout):
+class MyCheckBox(GridLayout):
     parameter_text = kprop.StringProperty()
     active = kprop.BooleanProperty()
 
