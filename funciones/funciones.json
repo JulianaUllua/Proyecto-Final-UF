@@ -7,7 +7,11 @@
       "output images": 1,
       "parameters_order": [],
       "outputs_order": ["dst"],
-      "widgets": [{"especial":"self.load_dialog()"}]
+      "widgets": [{"especial":"self.load_dialog()"}],
+      "information": [{
+          "function": "",
+          "parameters": "\n"
+      }]
     },
     {
         "nombre": "Resize",
@@ -36,6 +40,10 @@
                     "text": 0.5,
                     "label": "fy"
                 }] 
+        }],
+        "information": [{
+            "function": "Resizes an image.\nThe function resize resizes the image src down to or up to the specified size.",
+            "parameters": "src: input image.\ndst: output image; it has the size dsize (when it is non-zero) or the size computed from src.size(), fx, and fy; the type of dst is the same as of src.\ndsize: output image size; if it equals zero, it is computed as: dsize = Size(round(fx*src.cols), round(fy*src.rows)), Either dsize or both fx and fy must be non-zero.\nfx: scale factor along the horizontal axis; when it equals 0, it is computed as: (double)dsize.width/src.cols\nfy: scale factor along the vertical axis; when it equals 0, it is computed as: (double)dsize.height/src.rows\ninterpolation: interpolation method"
         }]
     },
     {
@@ -52,7 +60,11 @@
                         "values":["cv2.COLOR_BGR2HSV","cv2.COLOR_BGR2GRAY","cv2.COLOR_BGR2BGRA","cv2.COLOR_RGB2RGBA"],
                         "label":"Color"}
                                ]
-                    }]
+                    }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     {
         "nombre": "Apply ColorMap",
@@ -78,7 +90,11 @@
                             "cv2.COLORMAP_TURBO": "icons/colorscale_turbo.jpg","cv2.COLORMAP_DEEPGREEN": "icons/colorscale_deepgreen.jpg"},
                         "label":"ColorMap"}
                                ]
-                    }]
+                    }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     {
         "nombre": "Median Blur",
@@ -92,7 +108,11 @@
                 "slider": [
                     {"min":1, "max":99, "step": 2, "value": 13, "label":"ksize"}
                 ]
-            }]
+            }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     {
         "nombre": "Gaussian Blur",
@@ -130,9 +150,12 @@
                     "input type": "float",
                     "text": 0,
                     "label": "SigmaY"
-                }]
-                  
-            }]
+                }]                  
+            }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     
     {
@@ -155,7 +178,11 @@
                         {"min":1, "max":255, "step": 1, "value": 255, "label":"MaxVal"},
                         {"min":1, "max":255, "step": 1, "value": 145, "label":"Threshold"}
                     ]            
-            }]
+            }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     {
         "nombre": "Otsu",
@@ -173,7 +200,11 @@
                         {"min":1, "max":255, "step": 1, "value": 255, "label":"MaxVal"},
                         {"min":1, "max":255, "step": 1, "value": 40, "label":"Threshold"}
                     ]            
-            }]
+            }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     {
         "nombre": "Adaptive Threshold",
@@ -202,7 +233,11 @@
                 }
                     ]
                 
-            }]
+            }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     {
         "nombre": "Canny",
@@ -218,8 +253,11 @@
                 {"min":1, "max":255, "step": 1, "value": 200, "label":"Max threshold"},
                 {"min":3, "max":7, "step": 2, "value": 3, "label":"apertureSize"}
             ]
-
-      }]
+      }],
+      "information": [{
+        "function": "",
+        "parameters": "\n"
+    }]
     },
     {
         "nombre": "Laplacian",
@@ -247,7 +285,11 @@
                         {"min":0, "max":100, "step": 1, "value": 1, "label":"scale"},
                         {"min":0, "max":100, "step": 1, "value": 0, "label":"delta"}
                     ]
-      }]
+      }],
+      "information": [{
+        "function": "",
+        "parameters": "\n"
+    }]
     },
     {
         "nombre": "Convert Scale Abs",
@@ -257,7 +299,11 @@
         "output images": 1,
         "parameters_order": [],
         "outputs_order": ["dst"],
-        "widgets": []
+        "widgets": [],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     {
         "nombre": "Bitwise And",
@@ -267,7 +313,11 @@
         "output images": 1,
         "parameters_order": ["dst","mask"],
         "outputs_order": ["dst"],
-        "widgets": []
+        "widgets": [],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     {
         "nombre": "Ones Like",
@@ -277,7 +327,11 @@
         "output images": 1,
         "parameters_order": ["array"],
         "outputs_order": ["ndarray"],
-        "widgets": []
+        "widgets": [],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     {
         "nombre": "Zeros Like",
@@ -287,7 +341,11 @@
         "output images": 1,
         "parameters_order": ["array"],
         "outputs_order": ["ndarray"],
-        "widgets": []
+        "widgets": [],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     {
         "nombre": "Full Like",
@@ -297,7 +355,11 @@
         "output images": 1,
         "parameters_order": ["array"],
         "outputs_order": ["ndarray"],
-        "widgets": []
+        "widgets": [],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
     },
     {
         "nombre": "Empty Like",
@@ -307,23 +369,10 @@
         "output images": 1,
         "parameters_order": ["array"],
         "outputs_order": ["ndarray"],
-        "widgets": []
-    },
-    {
-        "nombre": "Connected Components",
-        "funcion": "cv2.connectedComponents",
-        "group": "Point Operations",
-        "input images": 1,
-        "output images": 1,
-        "parameters_order": ["connectivity", "ltype"],
-        "outputs_order": ["retval", "labels"],
-        "widgets": [{
-        "slider": [{"min":4, "max":8, "step": 4, "value": 8, "label":"connectivity"}],
-        "spinner": [{
-                "text":"cv2.CV_32S",
-                "values":["cv2.CV_32S","cv2.CV_16U"],
-                "label":"ltype"
-            }]
+        "widgets": [],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
         }]
-    }                     
+    }             
 ]

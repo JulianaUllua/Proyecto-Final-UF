@@ -1,0 +1,29 @@
+[
+    {
+      "nombre": "Discrete Fourier transform",
+      "funcion": "cv2.dft",
+      "group": "Fourier",
+      "input images": 1,
+      "output images": 1,
+      "parameters_order": ["flags", "nonzeroRows"],
+      "outputs_order": ["dst"],
+      "widgets": [{
+        "spinner": [
+            {
+                "text":0,
+                "values":[0,"cv2.DFT_INVERSE","cv2.DFT_SCALE","cv2.DFT_ROWS","cv2.DFT_COMPLEX_OUTPUT","cv2.DFT_REAL_OUTPUT","cv2.DFT_COMPLEX_INPUT","cv2.DCT_INVERSE","DCT_ROWS"],
+                "label":"flags"
+            }],
+        "text input": [
+            {
+                "input type": "int",
+                "text": 0,
+                "label": "nonzeroRows"
+            }]
+        }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
+    }        
+]

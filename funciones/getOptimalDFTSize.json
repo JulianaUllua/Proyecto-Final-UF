@@ -1,0 +1,23 @@
+[
+    {
+      "nombre": "Optimal DFT Size",
+      "funcion": "cv2.getOptimalDFTSize",
+      "group": "Fourier",
+      "input images": 0,
+      "output images": 0,
+      "parameters_order": ["vecsize"],
+      "outputs_order": ["retval"],
+      "widgets": [{
+        "text input": [
+            {
+                "input type": "int",
+                "text": 0,
+                "label": "vecsize"
+            }]
+        }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
+    }        
+]

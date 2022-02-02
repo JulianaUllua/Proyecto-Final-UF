@@ -1,0 +1,39 @@
+[
+  {
+    "nombre": "Sobel",
+    "funcion": "cv2.Sobel",
+    "group": "Local Operations",
+    "input images": 1,
+    "output images": 1,
+    "parameters_order": ["ddepth", "dx", "dy", "ksize"],
+    "outputs_order": ["dst"],
+    "widgets": [{
+      "spinner": [
+          {
+              "text":"cv2.CV_8U",
+              "values":["cv2.CV_8U","cv2.CV_16U","cv2.CV_32F","cv2.CV_64F"],
+              "label":"ddepth"
+          }
+              ],
+      "slider": [
+                {"min":1, "max":7, "step": 2, "value": 3, "label":"ksize"}
+            ],
+          "text input": [
+          {
+              "input type": "int",
+              "text": 1,
+              "label": "dx"
+          }, 
+          {
+              "input type": "int",
+              "text": 0,
+              "label": "dy"
+          }]
+            
+      }],
+      "information": [{
+          "function": "",
+          "parameters": "\n"
+      }]
+  }
+]
