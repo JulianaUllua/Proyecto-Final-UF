@@ -3,7 +3,6 @@ import kivy
 import os
 from pathlib import Path
 from kivy.uix.behaviors.button import ButtonBehavior
-from kivy_garden.contextmenu.context_menu import ContextMenuDivider
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -18,7 +17,6 @@ from functools import partial
 from PIL import Image
 
 import itertools
-import kivy.garden 
 #from kivy_garden.graph import Graph, MeshLinePlot
 #from kivy.garden.matplotlib import FigureCanvasKivyAgg
 from kivy.app import App
@@ -28,9 +26,6 @@ import kivy.properties as kprop
 from kivy.lang import Builder
 from kivy.factory import Factory
 from kivy.base import runTouchApp
-
-import kivy_garden.contextmenu
-from kivy_garden.contextmenu import AbstractMenuItem
 
 #import widgets:
 from kivy.uix.floatlayout import FloatLayout
