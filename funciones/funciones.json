@@ -308,5 +308,22 @@
         "parameters_order": ["array"],
         "outputs_order": ["ndarray"],
         "widgets": []
-    }             
+    },
+    {
+        "nombre": "Connected Components",
+        "funcion": "cv2.connectedComponents",
+        "group": "Point Operations",
+        "input images": 1,
+        "output images": 1,
+        "parameters_order": ["connectivity", "ltype"],
+        "outputs_order": ["retval", "labels"],
+        "widgets": [{
+        "slider": [{"min":4, "max":8, "step": 4, "value": 8, "label":"connectivity"}],
+        "spinner": [{
+                "text":"cv2.CV_32S",
+                "values":["cv2.CV_32S","cv2.CV_16U"],
+                "label":"ltype"
+            }]
+        }]
+    }                     
 ]
