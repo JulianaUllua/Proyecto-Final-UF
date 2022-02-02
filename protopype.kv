@@ -630,6 +630,7 @@
                                 text: "Cancelar"
                                 size_hint: .5, 1
                                 on_press: root.mainfloat.delete_line_popup.dismiss()
+
 <Save_workspace_button>:
         BoxLayout:
                 orientation: 'vertical'
@@ -727,6 +728,7 @@
                                 text: "Save"
                                 size_hint: .3,.9
                                 on_press: root.mainfloat.Export_Pipe_Code(filename_in.text)
+
 <Extension_Dropdown>:
         Button:
                 text: "File Format:"
@@ -759,6 +761,7 @@
                         size_hint_y: None
                         height: '48dp'
                         on_release: dropdown_ex.select(".bmp")                        
+
 <ImageViewer>:
         do_default_tab: False
         tab_width: None
