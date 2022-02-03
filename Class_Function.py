@@ -55,7 +55,8 @@ color = {
     "Local Operations" : (1, 69/255, 0, 1),
     "Point Operations" : (1, 131/255, 0, 1),
     "Arithmetic Operations" : (236/255, 227/255, 0, 1),
-    "Numpy Functions" : (168/255, 244/255, 0, 1)
+    "Numpy Functions" : (168/255, 244/255, 0, 1), 
+    "Morphology":(168/255, 244/255, 0, 1)
 }
 #verde 166/255, 209/255, 180/255, 1
 #148/255, 211/255, 200/255, 1
