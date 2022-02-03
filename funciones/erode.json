@@ -1,0 +1,18 @@
+[
+    {
+      "nombre": "Erode",
+      "funcion": "cv2.erode",
+      "group": "Morphology",
+      "input images": 1,
+      "output images": 1,
+      "parameters_order": ["kernel"],
+      "outputs_order": ["dst"],
+      "widgets": [{
+          "assign": [{"text":"cv2.getStructuringElement(cv2.MORPH_RECT, (3,3))", "label": "kernel"} ]
+        }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
+    }        
+]

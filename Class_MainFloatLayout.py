@@ -5,8 +5,8 @@ from pathlib import Path
 ##from kivy.uix.behaviors.button import ButtonBehavior
 #from kivy_garden.contextmenu.context_menu import ContextMenuDivider
 import numpy as np
-#import matplotlib
-#import matplotlib.pyplot as plt
+import matplotlib
+import matplotlib.pyplot as plt
 import json
 from cv2 import cv2
 from numpy.lib.type_check import imag

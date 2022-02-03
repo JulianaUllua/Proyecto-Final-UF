@@ -1,0 +1,16 @@
+[
+    {
+      "nombre": "Generalized Matrix Multiplication",
+      "funcion": "cv2.gemm",
+      "group": "Operations",
+      "input images": 3,
+      "output images": 1,
+      "parameters_order": [],
+      "outputs_order": ["dst"],
+      "widgets": [],
+      "information": [{
+          "function": "",
+          "parameters": "\n"
+      }]
+    }        
+]

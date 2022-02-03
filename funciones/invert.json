@@ -1,0 +1,23 @@
+[
+    {
+      "nombre": "Invert",
+      "funcion": "cv2.invert",
+      "group": "Geometry",
+      "input images": 1,
+      "output images": 1,
+      "parameters_order": ["flags"],
+      "outputs_order": ["retval", "dst"],
+      "widgets": [{        
+            "spinner": [
+                {
+                    "text":"cv2.DECOMP_LU",
+                    "values":["cv2.DECOMP_LU","cv2.DECOMP_SVD","cv2.DECOMP_EIG","cv2.DECOMP_CHOLESKY","cv2.DECOMP_QR","cv2.DECOMP_NORMAL"],
+                    "label":"borderType"
+                }]
+        }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
+    }        
+]

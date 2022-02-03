@@ -1,0 +1,35 @@
+[
+    {
+      "nombre": "Get Structuring Element",
+      "funcion": "cv2.getStructuringElement",
+      "group": "Morphology",
+      "input images": 0,
+      "output images": 0,
+      "parameters_order": ["shape", "ksize"],
+      "outputs_order": ["retval"],
+      "widgets": [{
+        "spinner": [
+            {
+                "text":"cv2.MORPH_RECT",
+                "values":["cv2.MORPH_RECT","cv2.MORPH_CROSS","cv2.MORPH_ELLIPSE"],
+                "label":"shape"
+            }
+                ],
+        "size": [
+            {
+                "label": "ksize",
+                "input type 1": "int",
+                "input type 2": "int",
+                "value 1": 3,
+                "value 2": 3,
+                "specification": "odd"
+
+            }   ]
+              
+        }],
+        "information": [{
+            "function": "",
+            "parameters": "\n"
+        }]
+    }
+  ]
