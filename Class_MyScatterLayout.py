@@ -265,13 +265,13 @@ class Bloque:
                             else:
                                 self.parameters[item] = 'no input'
 
-                            checkbox = MyCheckBox(item, False, size_hint=(1,1))                            
+                            checkbox = MyCheckBox(item, False, size_hint=(1,1), pos_hint= {'center_x':0.6})                            
                             checkbox.bind(active=self.add_input_buttons)
                             self.popup_bloque.ids.opcional_checkbox_input.add_widget(checkbox)
                         
                         for item in key['outputs_order']:
                             self.outputs[item] = 'no output'
-                            checkbox = MyCheckBox(item, False, size_hint=(1,1))
+                            checkbox = MyCheckBox(item, False, size_hint=(1,1), pos_hint= {'center_x':0.6})
                             checkbox.bind(active=self.add_output_buttons)
                             self.popup_bloque.ids.opcional_checkbox_output.add_widget(checkbox)
 
